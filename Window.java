@@ -1,42 +1,26 @@
-package v00s14;
+package v00s15;
 
-import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JProgressBar;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.AbstractListModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JButton;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import javax.swing.JTree;
 import javax.swing.JScrollPane;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.awt.event.ActionEvent;
 
@@ -49,9 +33,18 @@ public class Window extends JFrame implements Runnable {
 	public static String path;				// Will be overwritten by InputParameter of Window()
 	
 	public static JList Gui_FileList = null;
+	public static String txtBoxContent = "";
 	public static JTextArea txtBox = null;
-	public static JProgressBar progressBar = null;
+	public static JPanel panel_bottom = null;
+	public static JProgressBar progressBar_total;
+	private static JProgressBar progressBar_current;
 	public static JTextField adressField = null;
+	public static JButton btnAnalyze = new JButton("Analyze");
+	public static JButton btnStartGrab = null;
+	public static JButton btnDeleteAll = null;
+	public static JButton btnDestination = null;
+	public static JButton btnAbort = null;
+	public static JLabel lblMessage = null;
 	
 	public static TypeList MyTypeList = null;	// Holds ALL information about any file type
 	public static FileList MyFileList = null;	// Holds ALL information abut any found file
@@ -78,7 +71,8 @@ public class Window extends JFrame implements Runnable {
 		FileList.sort();
 		FileList.normalize();
 		TypeList.sort();
-		
+		txtBoxContent = TypeList.analize();
+		txtBoxUpdate();
 		//txtBox.setText(TypeList.analize());			// Can't automate at startup since txtBox-element is still NULL
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -89,57 +83,70 @@ public class Window extends JFrame implements Runnable {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		JPanel panel_bottom = new JPanel();
+		panel_bottom = new JPanel();
 		panel_bottom.setBounds(0, 333, 584, 29);
 		panel_bottom.setBackground(Color.DARK_GRAY);
 		contentPane.add(panel_bottom);
 		
-		JButton btnAnalyze = new JButton("Analyze");
+		// btnAnalyze = new JButton("Analyze");
 		btnAnalyze.setBounds(0, 3, 100, 23);
 		btnAnalyze.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				//listModel.clear();
+				setBottomBarWorking("Work in Progress - Analizing Files ...");
 				path = adressField.getText();
 				MyFileList = FileList.createFileList(General.getFileNames(path));
 				FileList.sort();
 				FileList.normalize();
 				FillFileList();																// ############ in usecase no new files will ever pop up so this button is only ment to reset any changes
-				txtBox.setText(TypeList.analize());
-				// progressBar.	// how to set data?
+				txtBox.setText(TypeList.analize());		// NOT UPDATING STATISTICS SITE AFTER INITIAL RUN
+				// progressBar.
+				setBottomBarIdle();
 			}
 		});
 		panel_bottom.setLayout(null);
 		panel_bottom.add(btnAnalyze);
 		
-		JButton btnStartGrab = new JButton("Start Grab");
+		btnDestination = new JButton("Destination");
+		btnDestination.setBounds(100, 3, 100, 23);
+		panel_bottom.add(btnDestination);
+		
+		btnStartGrab = new JButton("Start Grab");
 		btnStartGrab.setBounds(200, 3, 100, 23);
 		panel_bottom.add(btnStartGrab);
 		
-		JButton btnDeleteAll = new JButton("Delete All");
+		btnDeleteAll = new JButton("Delete All");
 		btnDeleteAll.setBounds(300, 3, 100, 23);
 		panel_bottom.add(btnDeleteAll);
+		btnAnalyze.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				// Set new destination folder
+			}
+		});
 		
-		JButton btnAbort = new JButton("Destination");
-		btnAbort.setBounds(100, 3, 100, 23);
-		panel_bottom.add(btnAbort);
-		
-		progressBar = new JProgressBar();
-		progressBar.setBounds(405, 16, 110, 9);
-		progressBar.setBackground(Color.BLACK);
-		panel_bottom.add(progressBar);
 		
 		JLabel lblNewLabel = new JLabel("New label");
 		lblNewLabel.setForeground(Color.GREEN);
 		lblNewLabel.setBounds(405, 3, 110, 14);
 		panel_bottom.add(lblNewLabel);
 		
-		JButton button = new JButton("Abort");
-		button.setBounds(519, 3, 65, 23);
-		panel_bottom.add(button);
+		progressBar_current = new JProgressBar();
+		progressBar_current.setBounds(405, 16, 110, 9);
+		progressBar_current.setBackground(Color.BLACK);
+		panel_bottom.add(progressBar_current);
 		
-		JProgressBar progressBar_1 = new JProgressBar();
-		progressBar_1.setBounds(5, 324, 574, 9);
-		contentPane.add(progressBar_1);
+		JButton btnAbort = new JButton("Abort");
+		btnAbort.setBounds(519, 3, 65, 23);
+		panel_bottom.add(btnAbort);
+		
+		lblMessage = new JLabel("MESSAGE");
+		lblMessage.setBounds(0, 7, 400, 14);
+		lblNewLabel.setForeground(Color.GREEN);
+		// panel_bottom.add(lblMessage);			// Only to be added while working
+		
+		progressBar_total = new JProgressBar();
+		progressBar_total.setBounds(5, 324, 574, 9);
+		contentPane.add(progressBar_total);
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setBounds(5, 5, 574, 319);
@@ -156,7 +163,7 @@ public class Window extends JFrame implements Runnable {
 		
 		listModel = new DefaultListModel();
 		FillFileList();
-		JList Gui_FileList = new JList(listModel);
+		Gui_FileList = new JList(listModel);
 		JScrollPane scrollList = new JScrollPane(Gui_FileList, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		Gui_FileList.setBackground(Color.DARK_GRAY);
 		Gui_FileList.setForeground(Color.WHITE);
@@ -285,6 +292,7 @@ public class Window extends JFrame implements Runnable {
 		scrollBox.setBackground(Color.DARK_GRAY);
 		scrollBox.setForeground(Color.WHITE);
 		scrollBox.setBounds(5, 0, 560, 285);
+		txtBoxUpdate();				// If content for txtBox is already defined, update now
 		
 		//txtBox.setBounds(5, 0, 560, 285);
 		panel_2.add(scrollBox);
@@ -431,5 +439,35 @@ public class Window extends JFrame implements Runnable {
 			result = result + " " + values[x];
 		}
 		return result;
+	}
+	public static void setCurrentProgress(int progress) {
+		progressBar_current.setValue(progress);
+	}
+	public static void setTotalProgress(int progress) {
+		progressBar_total.setValue(progress);
+	}
+	public void setBottomBarWorking(String message) {
+		panel_bottom.remove(btnAnalyze);
+		panel_bottom.remove(btnStartGrab);
+		panel_bottom.remove(btnDeleteAll);
+		panel_bottom.remove(btnDestination);
+		lblMessage.setText(message);
+		panel_bottom.add(lblMessage);
+		// panel_bottom.repaint();			// no effect
+		//panel_bottom.
+	}
+	public void setBottomBarIdle() {
+		panel_bottom.remove(lblMessage);
+		panel_bottom.add(btnAnalyze);
+		panel_bottom.add(btnStartGrab);
+		panel_bottom.add(btnDeleteAll);
+		panel_bottom.add(btnDestination);
+	}
+	public void txtBoxUpdate() {
+		if (txtBox!=null) {
+			txtBox.setText(txtBoxContent);
+		} else {
+			System.out.println("element 'txtBox' coot initialized yet - setting 'text' parameter has to wait");
+		}
 	}
 }
