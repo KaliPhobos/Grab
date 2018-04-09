@@ -1,4 +1,4 @@
-package v00s15;
+package v00s16;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -49,7 +49,7 @@ public class Window extends JFrame implements Runnable {
 	public static TypeList MyTypeList = null;	// Holds ALL information about any file type
 	public static FileList MyFileList = null;	// Holds ALL information abut any found file
 	
-	public static int[] SelectedListItemIndex = null;
+	public static int[] SelectedListItemIndex = new int[] {0};
 	//List SelectedListItemIndex = Collections.synchronizedList(new ArrayList(0));
 	
 	boolean initial = true;
@@ -99,7 +99,8 @@ public class Window extends JFrame implements Runnable {
 				FileList.sort();
 				FileList.normalize();
 				FillFileList();																// ############ in usecase no new files will ever pop up so this button is only ment to reset any changes
-				txtBox.setText(TypeList.analize());		// NOT UPDATING STATISTICS SITE AFTER INITIAL RUN
+				txtBoxContent = TypeList.analize();		// NOT UPDATING STATISTICS SITE AFTER INITIAL RUN
+				txtBoxUpdate();
 				// progressBar.
 				setBottomBarIdle();
 			}
@@ -407,10 +408,13 @@ public class Window extends JFrame implements Runnable {
 		}
 	}
 	public static int getMin(int[] num) {
-		int min = num[0];
-		for(int i=0;i<num.length;i++) {
-			if(num[i]<min) {
-				min=num[i];
+		int min = 0;
+		if(num!=null) {
+			min = num[0];
+			for(int i=0;i<num.length;i++) {
+				if(num[i]<min) {
+					min=num[i];
+				}
 			}
 		}
 		return min;
@@ -425,10 +429,13 @@ public class Window extends JFrame implements Runnable {
 		return min;
 	}*/
 	public static int getMax(int[] num) {
-		int max = num[0];
-		for(int i=0;i<num.length;i++) {
-			if(num[i]>max) {
-				max=num[i];
+		int max = 0;
+		if (num!=null) {
+			max = num[0];
+			for(int i=0;i<num.length;i++) {
+				if(num[i]>max) {
+					max=num[i];
+				}
 			}
 		}
 		return max;

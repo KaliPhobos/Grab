@@ -1,8 +1,9 @@
-package v00s15;
+package v00s16;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,50 +108,45 @@ public class General {
 		}
 		return FullNames;
 	}
-	public static List<File> loadFiles(String path) {
-	/*public static Object[] loadFiles(String path) {
-		int totalCount = 1;
-		int backupCount = 0;
-		int backupCount2 = 0;
-		DefaultMutableTreeNode[] treeNodes = new DefaultMutableTreeNode[1000];
-		treeNodes[0] = new DefaultMutableTreeNode("root");*/
-		File folder = new File(path);
-		File[] listOfFiles = folder.listFiles();
-		List<File> allFiles = new ArrayList<File>();	// BUG: Ignores any files in top directory
-		for (int i = 0; i < listOfFiles.length; i++) {
-			if (listOfFiles[i].isDirectory()) {									// Enter subfolder
-		   		try {
-		   			//File[] temp = new File(path+"\\"+listOfFiles[i].getName()).listFiles();
-		   			File[] temp = new File(path+"/"+listOfFiles[i].getName()).listFiles();
-					System.out.println("folder: "+listOfFiles[i].getPath());
-					/*treeNodes[totalCount] = new DefaultMutableTreeNode(listOfFiles[i].getName()+" --");
-					backupCount2 = backupCount;
-					backupCount = totalCount;*/
-					for (int j = 0; j < temp.length; j++) {
-						System.out.println("file: "+temp[i].getPath());
-						if (!temp[j].isDirectory()) {							// No folders will show up in Results
-							allFiles.add(temp[j]);								// Add file in folder to list
-						}
-						/*treeNodes[totalCount] = new DefaultMutableTreeNode(listOfFiles[i].getName());
-						treeNodes[backupCount].add(treeNodes[totalCount]);*/
-		   			}
-					//treeNodes[backupCount2].add(treeNodes[backupCount]);												// guess I fucked something up here
-
-		   		} catch (Exception e) {
-		   			System.out.println("ERROR reading Folder " + path+"/"+listOfFiles[i].getName());
-		   		}
-		   		//totalCount++;
-		   	} else {
-		    	allFiles.add(listOfFiles[i]);									// Add file to list
-				System.out.println("file: "+listOfFiles[i].getPath());
-				/*treeNodes[totalCount] = new DefaultMutableTreeNode(listOfFiles[i].getName());
-				treeNodes[0].add(treeNodes[totalCount]);
-				totalCount++;*/
-		   	}
+	public static List<File> loadFiles(String path) {			// BUG: Ignores any files in top directory
+		List<File> allFiles = new ArrayList<File>();			// Creates Lists of all Files and Folders found
+		List<String> folders = new ArrayList<String>();			// Then recursively applies function to any found subfolders again
+		folders.add(path);										// Returns a list of any files
+		while (folders.isEmpty()==false) {
+			path = folders.get(0);
+			System.out.println("new PATH: "+path);
+			File folder = new File(path);
+			File[] listOfFiles = folder.listFiles();
+			if(listOfFiles==null) {
+				System.out.println("NULL files");
+			} else {
+				for (int i = 0; i < listOfFiles.length; i++) {
+					if (listOfFiles[i].isDirectory()) {									// Enter subfolder
+				   		try {
+				   			File[] temp = new File(path+"\\"+listOfFiles[i].getName()).listFiles();
+							System.out.println("folder: "+listOfFiles[i].getPath());
+							for (int j = 0; j < temp.length; j++) {
+								System.out.println("file: "+temp[i].getPath());
+								if (!temp[j].isDirectory()) {							// No folders will show up in Results
+									allFiles.add(temp[j]);								// Add file in folder to list
+								}
+				   			}
+				   		} catch (Exception e) {
+				   			System.out.println("ERROR reading Folder " + path+"\\"+listOfFiles[i].getName());
+				   			folders.add(path+"\\"+listOfFiles[i].getName());
+				   		}
+				   	} else {
+				    	allFiles.add(listOfFiles[i]);									// Add file to list
+						System.out.println("file: "+listOfFiles[i].getPath());
+				   	}
+				}
+			}	// not null files
+			folders.remove(0);		// Remove first item in the line
 		}
+		
 		return allFiles;
-		//return new Object[] {allFiles, treeNodes[0]};
 	}
+	
 	public static TypeList loadTypes(List<File> allFiles) {
 		TypeList Types = TypeList.createTypeList(new String[][] {						// ending, category, relevance, quantity
 			{"vcf", "Contacts", "100"},
@@ -171,7 +167,7 @@ public class General {
 			{"readme", "Document", "40"},
 			{"pdf", "Document", "50"},
 			{"xlsx", "Document", "60"},
-			{"one", "Document", "99"},
+			{"one", "Document", "99"},			// HAVE TO CHANGE FROM STRING ARRAY TO ARRAYLIST
 			{"obj", "Document", "50"},
 			{"xml", "Document", "60"},
 			{"sql", "Document", "90"},
