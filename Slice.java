@@ -1,4 +1,4 @@
-package v00s05;
+package v00s06;
 
 import java.awt.Color;
 

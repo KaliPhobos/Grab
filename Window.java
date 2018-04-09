@@ -1,4 +1,4 @@
-package v00s05;
+package v00s06;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -81,10 +81,13 @@ public class Window extends JFrame implements Runnable {
 		panel.setLayout(null);
 		
 		JList list = new JList();
+		JScrollPane scroll = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		list.setBackground(Color.DARK_GRAY);
 		list.setForeground(Color.WHITE);
+		scroll.setBackground(Color.DARK_GRAY);
+		scroll.setForeground(Color.WHITE);
 		list.setModel(new AbstractListModel() {
-			String[] values = new String[] {"file1", "file2", "file3", "file4", "file5", "file6", "file7", "file8"};
+			String[] values = new String[] {"C:\\xampp\\phpMyAdmin\\robots.txt", "C:\\xampp\\phpMyAdmin\\schema_export.php", "C:\\xampp\\phpMyAdmin\\server_binlog.php", "C:\\xampp\\phpMyAdmin\\server_collations.php", "C:\\xampp\\phpMyAdmin\\server_databases.php", "C:\\xampp\\phpMyAdmin\\server_engines.php", "C:\\xampp\\phpMyAdmin\\server_export.php", "C:\\xampp\\phpMyAdmin\\server_import.php", "C:\\xampp\\phpMyAdmin\\server_plugins.php", "C:\\xampp\\phpMyAdmin\\server_privileges.php", "C:\\xampp\\phpMyAdmin\\server_replication.php", "C:\\xampp\\phpMyAdmin\\server_sql.php", "C:\\xampp\\phpMyAdmin\\server_status.php", "C:\\xampp\\phpMyAdmin\\server_status_advisor.php", "C:\\xampp\\phpMyAdmin\\server_status_monitor.php", "C:\\xampp\\phpMyAdmin\\server_status_processes.php", "C:\\xampp\\phpMyAdmin\\server_status_queries.php", "C:\\xampp\\phpMyAdmin\\server_status_variables.php", "C:\\xampp\\phpMyAdmin\\server_user_groups.php", "C:\\xampp\\phpMyAdmin\\server_variables.php"};
 			public int getSize() {
 				return values.length;
 			}
@@ -92,8 +95,9 @@ public class Window extends JFrame implements Runnable {
 				return values[index];
 			}
 		});
-		list.setBounds(144, 23, 415, 257);
-		panel.add(list);
+		scroll.setBounds(144, 23, 415, 234);
+		//panel.add(list);
+		panel.add(scroll);
 		
 		JCheckBox chckbxCopyExecutables = new JCheckBox("Copy Documents");
 		chckbxCopyExecutables.setBackground(new Color(192, 192, 192));
@@ -156,6 +160,22 @@ public class Window extends JFrame implements Runnable {
 		JLabel lblFilterFiles = new JLabel("Filter Targets:");
 		lblFilterFiles.setBounds(10, 4, 128, 14);
 		panel.add(lblFilterFiles);
+		
+		JButton btnMoveUp = new JButton("Move Up");
+		btnMoveUp.setBounds(254, 263, 100, 23);
+		panel.add(btnMoveUp);
+		
+		JButton btnMoveDown = new JButton("Move Down");
+		btnMoveDown.setBounds(364, 263, 100, 23);
+		panel.add(btnMoveDown);
+		
+		JButton btnTopPriority = new JButton("Top Priority");
+		btnTopPriority.setBounds(144, 263, 100, 23);
+		panel.add(btnTopPriority);
+		
+		JButton btnCancel = new JButton("Cancel");
+		btnCancel.setBounds(474, 263, 85, 23);
+		panel.add(btnCancel);
 		
 		JPanel panel_2 = new JPanel();
 		tabbedPane.addTab("Statistics", null, panel_2, null);

@@ -1,4 +1,4 @@
-package v00s05;
+package v00s06;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,9 +28,10 @@ public class main {
 					is_match = true;
 					int imp = Integer.parseInt(Types[_x][2]);
 					int Importance = sqr(imp)/(Integer.parseInt(Types[_x][3])+1);
-					System.out.println("File " + allFiles.get(i).getName() + " is of type " + Types[_x][1] + "(priority "+Types[_x][2]+"%) and got the individual Importance of " + Importance);
+					//System.out.println("File " + allFiles.get(i).getName() + " is of type " + Types[_x][1] + "(priority "+Types[_x][2]+"%) and got the individual Importance of " + Importance);
 					Files[i] = new String[] {allFiles.get(i).getName(), allFiles.get(i).getPath(), allFiles.get(i).length()+"", Importance+"", "0"};
-					System.out.println(Files[i][0]+"\n"+Files[i][1]+"\n"+Files[i][2]+"\n"+Files[i][3]+"\n"+Files[i][4]);
+					//System.out.println(Files[i][0]+"\n"+Files[i][1]+"\n"+Files[i][2]+"\n"+Files[i][3]+"\n"+Files[i][4]);
+					System.out.println(Files[i][1]);
 				}
 			}
 			if (!is_match) {											// no match
