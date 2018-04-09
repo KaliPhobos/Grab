@@ -1,4 +1,4 @@
-package v00s06;
+package v00s07;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -8,6 +8,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
+
+import javax.swing.AbstractListModel;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
@@ -27,31 +29,28 @@ public class main {
 				if(Ending.toLowerCase().equals(Types[_x][0])) {			// match
 					is_match = true;
 					int imp = Integer.parseInt(Types[_x][2]);
-					int Importance = sqr(imp)/(Integer.parseInt(Types[_x][3])+1);
-					//System.out.println("File " + allFiles.get(i).getName() + " is of type " + Types[_x][1] + "(priority "+Types[_x][2]+"%) and got the individual Importance of " + Importance);
+					int Importance = (imp*imp)/(Integer.parseInt(Types[_x][3])+1);
 					Files[i] = new String[] {allFiles.get(i).getName(), allFiles.get(i).getPath(), allFiles.get(i).length()+"", Importance+"", "0"};
+					//System.out.println("File " + allFiles.get(i).getName() + " is of type " + Types[_x][1] + "(priority "+Types[_x][2]+"%) and got the individual Importance of " + Importance);
 					//System.out.println(Files[i][0]+"\n"+Files[i][1]+"\n"+Files[i][2]+"\n"+Files[i][3]+"\n"+Files[i][4]);
 					System.out.println(Files[i][1]);
 				}
 			}
 			if (!is_match) {											// no match
-				System.out.println(Ending);
+				//System.out.println(Ending);
 			}
 		}
-		
-		
 		(new Thread(new Window())).start();
-		/*JFrame frame = new JFrame();
-		frame.getContentPane().add(new PieDiagramm(getSlices(Types, 3)));
-		frame.getContentPane().add(new PieDiagramm(getSlices(Types, 2)));
-		frame.setSize(600, 400);
-		frame.setLayout(new GridLayout(2, 3));
-		frame.setVisible(true);*/
-		
 	}
 	
-
-	
+	public static String[] getFileList() {
+		List<File> allFiles = loadFiles("C:\\xampp");	// "C:\\Users\\p2\\Downloads\\test"
+		String[] FullNames = new String[allFiles.size()];
+		for (int i = 0; i < allFiles.size(); i++) {
+			FullNames[i] = allFiles.get(i).getPath();
+		}
+		return FullNames;
+	}
 	
 	public static Slice[] getSlices(String[][] Types, int parameter) {
 		Slice[] slices = new Slice[Types.length];
@@ -62,9 +61,6 @@ public class main {
 		return slices;
 	}
 	
-	public static int sqr(int a) {
-		return a*a;
-	}
 	public static String[][] loadTypes(List<File> allFiles) {
 		String[][] Types = {						// ending, category, relevance, quantity
 				{"jpg", "Image", "90", "0"},
