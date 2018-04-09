@@ -1,13 +1,23 @@
-package v00s03;
+package v00s04;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.Rectangle;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
 
 public class main {
+	public static String[][] Types = null;
+
+
 	public static void main(String[] args) {
-		List<File> allFiles = loadFiles("C:\\xampp");	// "C:\\Users\\p2\\Downloads\\test"
-		String[][] Types = loadTypes(allFiles);
+		List<File> allFiles = loadFiles("C:\\Users\\p2\\Downloads");	// "C:\\Users\\p2\\Downloads\\test"
+		Types = loadTypes(allFiles);
 		String[][] Files = new String[allFiles.size()][5];		// FileName, FullPath, FileSize, Relevance, AdditionalRelevance
 		for (int i = 0; i < allFiles.size(); i++) {
 			String[] temp = allFiles.get(i).getName().split("\\.");
@@ -20,15 +30,36 @@ public class main {
 					int Importance = sqr(imp)/(Integer.parseInt(Types[_x][3])+1);
 					System.out.println("File " + allFiles.get(i).getName() + " is of type " + Types[_x][1] + "(priority "+Types[_x][2]+"%) and got the individual Importance of " + Importance);
 					Files[i] = new String[] {allFiles.get(i).getName(), allFiles.get(i).getPath(), allFiles.get(i).length()+"", Importance+"", "0"};
-					//System.out.println(Files[i][0]+"\n"+Files[i][1]+"\n"+Files[i][2]+"\n"+Files[i][3]+"\n"+Files[i][4]);
+					System.out.println(Files[i][0]+"\n"+Files[i][1]+"\n"+Files[i][2]+"\n"+Files[i][3]+"\n"+Files[i][4]);
 				}
 			}
 			if (!is_match) {											// no match
 				System.out.println(Ending);
 			}
 		}
+		
+		
+		
+		GUI.CreateGui();
+		JFrame frame = new JFrame();
+		frame.getContentPane().add(new PieDiagramm(getSlices(Types, 3)));
+		frame.getContentPane().add(new PieDiagramm(getSlices(Types, 2)));
+		frame.setSize(600, 400);
+		frame.setLayout(new GridLayout(2, 3));
+		frame.setVisible(true);
 	}
 	
+
+	
+	
+	public static Slice[] getSlices(String[][] Types, int parameter) {
+		Slice[] slices = new Slice[Types.length];
+		for (int x=0;x<Types.length;x++) {
+			slices[x] = new Slice(Integer.parseInt(Types[x][parameter]), Color.black);
+			System.out.println(x + " - " + Types[x][parameter]);
+		}
+		return slices;
+	}
 	
 	public static int sqr(int a) {
 		return a*a;
@@ -45,6 +76,7 @@ public class main {
 				{"ppt", "Document", "70", "0"},
 				{"pptx", "Document", "70", "0"},
 				{"txt", "Document", "90", "0"},
+				{"conf", "Document", "30", "0"},
 				{"readme", "Document", "40", "0"},
 				{"log", "Logfile", "100", "0"},
 				{"bat", "Script", "60", "0"},
@@ -62,8 +94,7 @@ public class main {
 				{"7zip", "Archive", "60", "0"},
 				{"dll", "Binary", "10", "0"},
 				{"ini", "Binary", "10", "0"},
-				{"tmp", "Binary", "10", "0"},
-				{"conf", "Config", "30", "0"}
+				{"tmp", "Binary", "10", "0"}
 				};
 		
 		/*
