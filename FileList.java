@@ -1,4 +1,4 @@
-package v00s10;
+package v00s11;
 
 public class FileList {
 	static FileItem[] Files;
@@ -21,12 +21,14 @@ public class FileList {
 		Files[id] = item;
 	}
 	public static void sort() {
+		double relevance;
 		for(int pos=0;pos<Files.length;pos++) {
-			int id = 0;
+			int id = pos;
 			double max = getFile(pos).getTotalRelevance();
 			for(int item=pos;item<Files.length;item++) {
-				if (getFile(item).getTotalRelevance() > max) {
-					max = getFile(item).getTotalRelevance();
+				relevance = getFile(item).getTotalRelevance();
+				if (relevance > max) {
+					max = relevance;
 					id = item;										// saves id of new max
 				}
 			}

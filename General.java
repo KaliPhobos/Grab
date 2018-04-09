@@ -1,4 +1,4 @@
-package v00s10;
+package v00s11;
 
 import java.io.File;
 import java.io.FileReader;
@@ -215,31 +215,36 @@ public class General {
 				is_match = true;
 				double _quantity = Window.MyTypeList.getType(_x).getQuantity();
 				double _typeRelevance = Window.MyTypeList.getType(_x).getTypeRelevance();
-				result = ((_typeRelevance*_typeRelevance)/(_quantity)+1.0)/100.0-0.01;	// gedeckelt auf 100% - evtl unsaubere ergebnisse?			######################################
+				result = ((_typeRelevance*_typeRelevance)/Math.sqrt(Math.max(1.0, _quantity)))/100.0;	// gedeckelt auf 100% - evtl unsaubere ergebnisse?			######################################
+				System.out.println(_quantity + " - " + _typeRelevance + " = " + result);
 			}
 		}
 		if (!is_match) {																	// no match
-			result = 15;
+			result = 5;											// Basic relevance assigned to any unknown file type
 		}
 		return result;
 	}
 	public static double getAdditionalRelevance(double size) {
 		double additionalRelevance = 0.0;
-		if(size==0.0) {
-			additionalRelevance = 1.0;
+		if(size==0.0) {										// empty file
+			additionalRelevance = 10.0;
 		}
 		if (size>0 && size<500000.0) {						// less than 0.5MB
-			additionalRelevance = (size/1000000.0)*100.0+50.0;
+			additionalRelevance = (size/500000.0)*50.0+50.0;
 		}
-		if (size>500000.0 && size<12000000.0) {	// Sweet spot 1-12MB
-			additionalRelevance = 100.0;
+		if (size>500000.0 && size<12000000.0) {	// Sweet spot 0.5-12MB
+			additionalRelevance = 99.9;
 		}
 		if (size>12000000.0 && size<100000000.0) {	//large files (12-100MB)
-			additionalRelevance = ((size-12000000.0)/88000000.0)*100.0;
+			additionalRelevance = 100.0-(((size-12000000.0)/88000000.0)*70.0);
 		}
-		if (size>100000000.0) {					// fat ones, beyond 100MB
-			additionalRelevance = 0.0;
+		if (size>100000000.0 && size<1000000000) {			// fat ones, (100MB-1GB)
+			additionalRelevance = 30.0-(((size-100000000.0)/900000000.0)*20.0);
 		}
+		if (size>1000000000.0) {						// too fat ones, beyond 1GB
+			additionalRelevance = 10.0;
+		}
+		//System.out.println(size+"	 -->	"+additionalRelevance);
 		return additionalRelevance;
 	}
 	public static String FormatSize(double size) {
@@ -288,16 +293,26 @@ public class General {
 		return result;
 	}
 	public static double round(double value, int length) {
-		double yey;
-		if ((value+"").equals("Infinity")) {
-			yey=value;
+		// return a double but only with a given number of decimals
+		double result = value;
+		if ((result+"").equals("Infinity")) {			// INFINITY
+			System.out.println("infinity");
 		} else {
-			double keks = Double.parseDouble((value+"").substring(0, (value+"").length()-3)+"12");
-			// System.out.println("original: " + keks);
-			String z = (keks+"000").substring(0, (((int) keks)+"").length()+length+1);
-			yey = Double.parseDouble(z);
-			// System.out.println(value + " --> " + z + " --> " + yey);
+			for(int x=0;x<length;x++) {				// shift comma <--
+				result=result*10.0;
+			}
+			String b = result+"";						// double --> string
+			b = b.substring(0, b.indexOf("."));		// remove decimals
+			if(result>=Integer.MAX_VALUE) {			// OVERFlOW
+				System.out.println("overflow");
+			}
+			int a = Integer.parseInt(b);			//String --> int			no string-->double method available?
+			result = (double) a;						// int --> double
+			for(int x=0;x<length;x++) {
+				result=result/10.0;						// shift comma -->
+			}
+			//System.out.println(value + "	-->	"+ b +"	-->	" + result);
 		}
-		return yey;
+		return result;
 	}
 }

@@ -1,4 +1,4 @@
-package v00s10;
+package v00s11;
 
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
@@ -52,6 +52,8 @@ public class Window extends JFrame implements Runnable {
 	public static int[] SelectedListItemIndex = null;
 	//List SelectedListItemIndex = Collections.synchronizedList(new ArrayList(0));
 	
+	boolean initial = true;
+	
 	public void run() {
 		this.setVisible(true);
 	}
@@ -60,18 +62,17 @@ public class Window extends JFrame implements Runnable {
 	/**
 	 * Create the frame.
 	 */
-	public Window() {
-		String path = "/Users/p2/Documents";
-		/*Object[] result = General.loadFiles(path);
-		List<File> allFiles = (List<File>) result[0];*/
+	public Window(String path) {
+		//String path = "/Users/p2/Documents";
 		List<File> allFiles = General.loadFiles(path);			// "C:\\Users\\p2\\Downloads\\test"
 		MyTypeList = General.loadTypes(allFiles);
 		MyFileList = FileList.createFileList(General.getFileNames(path));
-		MyFileList.sort();
-		MyFileList.normalize();
+		FileList.sort();
+		FileList.normalize();
+		TypeList.sort();
 		
+		TypeList.analyze();
 
-		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 600, 400);
 		contentPane = new JPanel();
@@ -88,8 +89,11 @@ public class Window extends JFrame implements Runnable {
 		JButton btnAnalyze = new JButton("Analyze");
 		btnAnalyze.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				listModel.clear();
-				FillFileList();
+				//listModel.clear();
+				MyFileList = FileList.createFileList(General.getFileNames(path));
+				FileList.sort();
+				FileList.normalize();
+				FillFileList();																// ############ in usecase no new files will ever pop up so this button is only ment to reset any changes
 			}
 		});
 		panel_1.add(btnAnalyze);
@@ -124,8 +128,7 @@ public class Window extends JFrame implements Runnable {
 		scrollList.setBackground(Color.DARK_GRAY);
 		scrollList.setForeground(Color.WHITE);
 		scrollList.setBounds(144, 23, 415, 234);
-		//Gui_FileList.addFocusListener(new CustomFocusListener());				// ######################
-		Gui_FileList.addListSelectionListener(new ListSelectionListener() {
+		Gui_FileList.addListSelectionListener(new ListSelectionListener() {		// Against all odds this listener is NOT causing the NullPointer-exception when trying to restore item focus
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
 				if (!arg0.getValueIsAdjusting()) {
@@ -133,7 +136,6 @@ public class Window extends JFrame implements Runnable {
 						//SelectedListItemIndex.clear();
 						SelectedListItemIndex = Gui_FileList.getSelectedIndices();	// Used to identify last selected Item for Move&Priorize buttons
 						System.out.println(getListContent(SelectedListItemIndex));
-
 					}
 				}
 			}
@@ -250,19 +252,27 @@ public class Window extends JFrame implements Runnable {
 		
 	}
 	public void FillFileList() {
-		for(int x=0;x<MyFileList.getLength();x++) {
-			FileItem currentFile = FileList.getFile(x);
-			listModel.addElement("("+(int) currentFile.getBasicRelevance()+"/"+(int) currentFile.getAdditionalRelevance()+"/"+(int) currentFile.getNormalizedRelevance()+")	"+currentFile.getPath() + "	("+currentFile.getSizeFormatted()+")");
+		if (initial==true) {
+			for(int x=0;x<FileList.getLength();x++) {
+				FileItem currentFile = FileList.getFile(x);
+				listModel.addElement("("+(int) currentFile.getBasicRelevance()+"/"+(int) currentFile.getAdditionalRelevance()+"/"+(int) currentFile.getNormalizedRelevance()+")	"+currentFile.getPath() + "	("+currentFile.getSizeFormatted()+")");
+			}
+			initial = false;
+		} else {
+			for(int x=0;x<FileList.getLength();x++) {
+				FileItem currentFile = FileList.getFile(x);
+				listModel.setElementAt("("+(int) currentFile.getBasicRelevance()+"/"+(int) currentFile.getAdditionalRelevance()+"/"+(int) currentFile.getNormalizedRelevance()+")	"+currentFile.getPath() + "	("+currentFile.getSizeFormatted()+")", x);
+			}
 		}
 	}
-	/*class CustomFocusListener implements FocusListener{
+	class CustomFocusListener implements FocusListener{							// No practical use yet but shall be used later 8Additional information when putting focus to certain text boxes//statistics
 		public void focusGained(FocusEvent e) {
 			System.out.println(e.getComponent().getClass().getSimpleName() + " gained focus. ");
 		}
 		public void focusLost(FocusEvent e) {
 			System.out.println(e.getComponent().getClass().getSimpleName() + " lost focus. ");
 		}   
-	}*/
+	}
 	class ActionListenerMoveUp implements ActionListener {						// Move all selected Items by -1 (up)
 		public void actionPerformed(ActionEvent arg0) {
 			System.out.println("move up");
@@ -272,7 +282,7 @@ public class Window extends JFrame implements Runnable {
 					SelectedListItemIndex[i]--;
 				}
 				System.out.println(getListContent(SelectedListItemIndex));
-				listModel.clear();
+				//listModel.clear();
 				FillFileList();
 				// focus, select
 			}
@@ -280,17 +290,17 @@ public class Window extends JFrame implements Runnable {
 	}
 	class ActionListenerMoveDown implements ActionListener {					// Move all selected Items by +1 (down)
 		public void actionPerformed(ActionEvent arg0) {
-			if (getMax(SelectedListItemIndex)<MyFileList.getLength()-1) {		// Item can be moved down (id<max)
+			if (getMax(SelectedListItemIndex)<FileList.getLength()-1) {			// Item can be moved down (id<max)
 				MyFileList.GuiMoveDown(SelectedListItemIndex);					// -> MOVE
 				for(int i=0;i<SelectedListItemIndex.length;i++) {				// shift IDs of selected items by +1
 					SelectedListItemIndex[i]++;
 				}
-				//Gui_FileList.setSelectedIndices(SelectedListItemIndex);
 
 				System.out.println(getListContent(SelectedListItemIndex));
-				listModel.removeAllElements();									// works just fine as well, but doesnt fix the bug with "setSelectedIndices"
+				//listModel.removeAllElements();								// works just fine as well, but doesnt fix the bug with "setSelectedIndices"
 				FillFileList();
-				// Gui_FileList.ensureIndexIsVisible(SelectedListItemIndex[0]);	// rel: https://java.wekeepcoding.com/article/11947811/Why+JList+uses+int%5b%5d+to+select+indices+when+it+require+a+Set+of+Integer%3f
+				//Gui_FileList.setSelectedIndices(SelectedListItemIndex);
+				//Gui_FileList.ensureIndexIsVisible(SelectedListItemIndex[0]);	// rel: https://java.wekeepcoding.com/article/11947811/Why+JList+uses+int%5b%5d+to+select+indices+when+it+require+a+Set+of+Integer%3f
 			}
 		}
 	}
@@ -302,7 +312,6 @@ public class Window extends JFrame implements Runnable {
 					SelectedListItemIndex[i]= i;
 				}
 				System.out.println(getListContent(SelectedListItemIndex));
-				listModel.clear();
 				FillFileList();
 				// focus, select
 			}
@@ -317,7 +326,7 @@ public class Window extends JFrame implements Runnable {
 		}
 		return min;
 	}
-	public static int getMin(ArrayList num) {
+	/*public static int getMin(ArrayList num) {
 		int min = (int) num.get(0);
 		for(int x=0;x<num.size();x++) {
 			if((int)num.get(x)<min) {
@@ -325,7 +334,7 @@ public class Window extends JFrame implements Runnable {
 			}
 		}
 		return min;
-	}
+	}*/
 	public static int getMax(int[] num) {
 		int max = num[0];
 		for(int i=0;i<num.length;i++) {
@@ -339,13 +348,6 @@ public class Window extends JFrame implements Runnable {
 		String result = "selected:";
 		for(int x=0;x<values.length;x++) {
 			result = result + " " + values[x];
-		}
-		return result;
-	}
-	public String getListContent(ArrayList values) {
-		String result = "selected:";
-		for(int x=0;x<values.size();x++) {
-			result = result + " " + values.get(x);
 		}
 		return result;
 	}

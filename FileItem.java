@@ -1,4 +1,4 @@
-package v00s10;
+package v00s11;
 
 import java.io.File;
 
@@ -28,9 +28,11 @@ public class FileItem {
 		String ending = temp[temp.length-1];
 		double size = new File(path).length();
 		String sizeFormatted = General.FormatSize(size);
-		double basicRelevance = General.getBasicRelevance(ending);
-		double additionalRelevance = General.getAdditionalRelevance(size);
-		double totalRelevance = (basicRelevance*additionalRelevance+100)/100;
+		double basicRelevance = Math.min(1000.0, General.getBasicRelevance(ending));
+		double additionalRelevance = Math.min(100.0, General.getAdditionalRelevance(size));
+		double totalRelevanceA = (basicRelevance*additionalRelevance+100)/100;
+		double totalRelevanceB = 10.0*Math.sqrt((double)(basicRelevance+10*Math.sqrt((double)additionalRelevance)));
+		double totalRelevance = (totalRelevanceA + totalRelevanceB) /2;
 		System.out.println("File " + name + " is of type " + Window.MyTypeList.getCategory(ending) + "(priority "+General.round(basicRelevance, 2)+"%), has a size of " + sizeFormatted + " (Additional Relevance " + General.round(additionalRelevance, 2) + "%) and got the individual Importance of " + General.round(totalRelevance, 2));
 		return new FileItem(path, name, ending, size, sizeFormatted, General.round(basicRelevance, 2), General.round(additionalRelevance, 2), General.round(totalRelevance, 2), 0.0);
 	}
