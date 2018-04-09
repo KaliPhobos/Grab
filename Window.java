@@ -1,4 +1,4 @@
-package v00s07;
+package v00s08;
 
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
@@ -67,7 +67,9 @@ public class Window extends JFrame implements Runnable {
 		JButton btnAnalyze = new JButton("Analyze");
 		btnAnalyze.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String[] FileNames = General.FileToStringArray("src/Files.txt");
+				//String[] FileNames = General.FileToStringArray("src/Files.txt");
+				//String[] FileNames = General.getFileNames("C:\\xampp");
+				String[] FileNames = General.GetStringArrayRow(General.OrderStringArrayBy(General.GetAnalyzedData("C:\\xampp"), 5), 1);
 				for(int x=0;x<FileNames.length;x++) {
 					listModel.addElement((FileNames[x]));
 				}
@@ -96,7 +98,7 @@ public class Window extends JFrame implements Runnable {
 		tabbedPane.addTab("Manage Files", null, panel, null);
 		panel.setLayout(null);
 		
-		String[] FileNames = General.FileToStringArray("src/Files.txt");
+		String[] FileNames = General.GetStringArrayRow(General.OrderStringArrayBy(General.GetAnalyzedData("C:\\xampp"), 5), 1);
 		listModel = new DefaultListModel();
 		for(int x=0;x<FileNames.length;x++) {
 			listModel.addElement((FileNames[x]));
@@ -222,71 +224,5 @@ public class Window extends JFrame implements Runnable {
 		
 		
 	}
-	public static FileWriter createWriter(String path) {
-		FileWriter writer = null;
-		try {
-			File file = new File(path);
-			System.out.println(file.getAbsolutePath());
-			if (file.exists()==false) {
-				file.createNewFile();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return writer;
-	}
-	public static FileReader createReader(String path) {
-		FileReader reader = null;
-		try {
-			File file = new File(path);
-			System.out.println(file.getAbsolutePath());
-			if (file.exists()==false) {
-				file.createNewFile();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return reader;
-	}
-	/*public static String readFile(String path, Charset encoding) throws IOException {
-		byte[] encoded = Files.readAllBytes(Paths.get(path));
-		return new String(encoded, encoding);
-	}*/
-	
-	
-	public static void createFileList(FileWriter writer) {
-		List<File> allFiles = loadFiles("C:\\xampp");	// "C:\\Users\\p2\\Downloads\\test"
-		for (int i = 0; i < allFiles.size(); i++) {
-			String path = allFiles.get(i).getAbsolutePath();
-			try {
-				writer.write(path);
-			} catch (Exception e) {
-				//e.printStackTrace();
-				System.out.println("error writing");
-			}
-		}
-	}
 
-	public static List<File> loadFiles(String path) {
-		System.out.println("LoadFiles");
-		File folder = new File(path);
-		File[] listOfFiles = folder.listFiles();
-		List<File> allFiles = new ArrayList<File>();	// BUG: Ignores any files in top directory
-		for (int i = 0; i < listOfFiles.length; i++) {
-			if (listOfFiles[i].isDirectory()) {									// Enter subfolder
-		   		try {
-		   			File[] temp = new File(path+"\\"+listOfFiles[i].getName()).listFiles();
-		   			for (int j = 0; j < temp.length; j++) {
-		   				allFiles.add(temp[j]);										// Add file in folder to list
-		   			}
-					//System.out.println("Folder " + path+"\\"+listOfFiles[i].getName());
-		   		} catch (Exception e) {
-		   			//System.out.println("ERROR reading Folder " + path+"\\"+listOfFiles[i].getName());
-		   		}
-		   	} else {
-		    	allFiles.add(listOfFiles[i]);									// Add file to list
-		   	}
-		}
-		return allFiles;
-	}
 }
