@@ -1,4 +1,4 @@
-package v00s12;
+package v00s13;
 
 import java.io.File;
 import java.io.FileReader;
@@ -153,6 +153,7 @@ public class General {
 	}
 	public static TypeList loadTypes(List<File> allFiles) {
 		TypeList Types = TypeList.createTypeList(new String[][] {						// ending, category, relevance, quantity
+			{"vcf", "PersonalData", "100"},
 			{"jpg", "Image", "90"},
 			{"jpeg", "Image", "90"},
 			{"png", "Image", "100"},
@@ -166,12 +167,13 @@ public class General {
 			{"pptx", "Document", "70"},
 			{"txt", "Document", "90"},
 			{"odt", "Document", "90"},
-			{"conf", "Document", "30"},
+			{"conf", "Document", "38"},
 			{"readme", "Document", "40"},
 			{"pdf", "Document", "50"},
 			{"xlsx", "Document", "60"},
-			{"one", "Document", "90"},
+			{"one", "Document", "99"},
 			{"obj", "Document", "50"},
+			{"xml", "Document", "60"},
 			{"log", "Logfile", "100"},
 			{"bat", "Script", "60"},
 			{"php", "Script", "60"},
@@ -179,12 +181,12 @@ public class General {
 			{"html", "Script", "50"},
 			{"css", "Script", "50"},
 			{"sql", "Table", "90"},
-			{"mp4", "Video", "60"},
-			{"mkv", "Video", "60"},
+			{"mp4", "Video", "63"},
+			{"mkv", "Video", "58"},
 			{"avi", "Video", "50"},
 			{"flv", "Video", "50"},
 			{"wav", "Audio", "70"},
-			{"mp3", "Audio", "70"},
+			{"mp3", "Audio", "75"},
 			{"exe", "Executable", "30"},
 			{"dmg", "Executable", "30"},
 			{"msi", "Executable", "30"},
@@ -193,8 +195,8 @@ public class General {
 			{"7zip", "Archive", "60"},
 			{"tar.gz", "Archive", "60"},
 			{"iso", "Archive", "70"},
-			{"dll", "Binary", "10"},
-			{"ini", "Binary", "10"},
+			{"dll", "Binary", "8"},
+			{"ini", "Binary", "12"},
 			{"tmp", "Binary", "10"}
 		});
 		for (int i = 0; i < allFiles.size(); i++) {

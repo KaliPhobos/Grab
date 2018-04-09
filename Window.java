@@ -1,4 +1,4 @@
-package v00s12;
+package v00s13;
 
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
@@ -9,6 +9,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JProgressBar;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -45,9 +46,12 @@ public class Window extends JFrame implements Runnable {
 	private JPanel contentPane;
 	private DefaultListModel listModel = null;
 	
+	public static String path;				// Will be overwritten by InputParameter of Window()
+	
 	public static JList Gui_FileList = null;
 	public static JTextArea txtBox = null;
 	public static JProgressBar progressBar = null;
+	public static JTextField adressField = null;
 	
 	public static TypeList MyTypeList = null;	// Holds ALL information about any file type
 	public static FileList MyFileList = null;	// Holds ALL information abut any found file
@@ -65,7 +69,8 @@ public class Window extends JFrame implements Runnable {
 	/**
 	 * Create the frame.
 	 */
-	public Window(String path) {
+	public Window(String InputParam_path) {
+		path = InputParam_path;
 		//String path = "/Users/p2/Documents";
 		List<File> allFiles = General.loadFiles(path);			// "C:\\Users\\p2\\Downloads\\test"
 		MyTypeList = General.loadTypes(allFiles);
@@ -93,6 +98,7 @@ public class Window extends JFrame implements Runnable {
 		btnAnalyze.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				//listModel.clear();
+				path = adressField.getText();
 				MyFileList = FileList.createFileList(General.getFileNames(path));
 				FileList.sort();
 				FileList.normalize();
@@ -205,6 +211,11 @@ public class Window extends JFrame implements Runnable {
 		chckbxCopyLogfiles.setBounds(5, 191, 133, 18);
 		panel.add(chckbxCopyLogfiles);
 		
+		adressField = new JTextField(InputParam_path);				// Insert Window-Thread input parameter
+		adressField.setBounds(5, 220, 133, 18);
+		chckbxCopyLogfiles.setBackground(new Color(192, 192, 192));
+		panel.add(adressField);
+		
 		JLabel lblFilterFiles = new JLabel("Filter Targets:");
 		lblFilterFiles.setBounds(10, 4, 128, 14);
 		panel.add(lblFilterFiles);
@@ -268,17 +279,34 @@ public class Window extends JFrame implements Runnable {
 		
 	}
 	public void FillFileList() {
+		String result;
+		if (initial==false) {								// To avoid bug: Will else reduce item height to fit additional items but only in initial run
+			listModel.setSize(FileList.getLength());
+		}
+		for(int x=0;x<FileList.getLength();x++) {
+			FileItem currentFile = FileList.getFile(x);
+			//listModel.addElement((int)currentFile.getTotalRelevance() + "("+(int) currentFile.getBasicRelevance()+"/"+(int) currentFile.getAdditionalRelevance()+"/"+(int) currentFile.getNormalizedRelevance()+")	"+currentFile.getPath() + "	("+currentFile.getSizeFormatted()+")");
+			double total = currentFile.getTotalRelevance();
+			String pre = "";
+			if (total>80) {
+			  	pre = "(HOT) ";
+			} else if (total>80) {
+				pre = "!";
+			} else {
+				pre = " ";
+			}
+			result = pre+currentFile.getPath() + "	("+currentFile.getSizeFormatted()+")";
+			if (initial==true) {
+				listModel.addElement(result);
+			} else {
+				listModel.setElementAt(result, x);
+			}
+		}
 		if (initial==true) {
-			for(int x=0;x<FileList.getLength();x++) {
-				FileItem currentFile = FileList.getFile(x);
-				listModel.addElement("("+(int) currentFile.getBasicRelevance()+"/"+(int) currentFile.getAdditionalRelevance()+"/"+(int) currentFile.getNormalizedRelevance()+")	"+currentFile.getPath() + "	("+currentFile.getSizeFormatted()+")");
-			}
 			initial = false;
-		} else {
-			for(int x=0;x<FileList.getLength();x++) {
-				FileItem currentFile = FileList.getFile(x);
-				listModel.setElementAt("("+(int) currentFile.getBasicRelevance()+"/"+(int) currentFile.getAdditionalRelevance()+"/"+(int) currentFile.getNormalizedRelevance()+")	"+currentFile.getPath() + "	("+currentFile.getSizeFormatted()+")", x);
-			}
+		}
+		if(listModel.getSize()>FileList.getLength()+1) {
+			listModel.removeRange(FileList.getLength()+1, listModel.getSize()-1);
 		}
 	}
 	class CustomFocusListener implements FocusListener{							// No practical use yet but shall be used later 8Additional information when putting focus to certain text boxes//statistics
