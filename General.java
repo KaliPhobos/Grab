@@ -1,10 +1,12 @@
-package v00s09;
+package v00s10;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.tree.DefaultMutableTreeNode;
 
 public class General {
 	
@@ -42,7 +44,9 @@ public class General {
 	}*/
 	public static void createFileList(FileWriter writer, String _path) {
 		
-		List<File> allFiles = loadFiles(_path);	// "C:\\Users\\p2\\Downloads\\test"
+		/*Object[] result = loadFiles(_path);
+		List<File> allFiles = (List<File>) result[0];*/
+		List<File> allFiles = loadFiles(_path);				// "C:\\Users\\p2\\Downloads\\test"
 		for (int i = 0; i < allFiles.size(); i++) {
 			String path = allFiles.get(i).getAbsolutePath();
 			try {
@@ -93,6 +97,8 @@ public class General {
 		return lines;
 	}*/
 	public static String[][] getFileNames(String path) {
+		/*Object[] result = loadFiles(path);
+		List<File> allFiles = (List<File>) result[0];*/
 		List<File> allFiles = loadFiles(path);
 		String[][] FullNames = new String[allFiles.size()][2];
 		for (int i = 0; i < allFiles.size(); i++) {
@@ -102,25 +108,46 @@ public class General {
 		return FullNames;
 	}
 	public static List<File> loadFiles(String path) {
+	/*public static Object[] loadFiles(String path) {
+		int totalCount = 1;
+		int backupCount = 0;
+		int backupCount2 = 0;
+		DefaultMutableTreeNode[] treeNodes = new DefaultMutableTreeNode[1000];
+		treeNodes[0] = new DefaultMutableTreeNode("root");*/
 		File folder = new File(path);
 		File[] listOfFiles = folder.listFiles();
 		List<File> allFiles = new ArrayList<File>();	// BUG: Ignores any files in top directory
 		for (int i = 0; i < listOfFiles.length; i++) {
 			if (listOfFiles[i].isDirectory()) {									// Enter subfolder
 		   		try {
-		   			File[] temp = new File(path+"\\"+listOfFiles[i].getName()).listFiles();
-		   			for (int j = 0; j < temp.length; j++) {
+		   			//File[] temp = new File(path+"\\"+listOfFiles[i].getName()).listFiles();
+		   			File[] temp = new File(path+"/"+listOfFiles[i].getName()).listFiles();
+					System.out.println("folder: "+listOfFiles[i].getPath());
+					/*treeNodes[totalCount] = new DefaultMutableTreeNode(listOfFiles[i].getName()+" --");
+					backupCount2 = backupCount;
+					backupCount = totalCount;*/
+					for (int j = 0; j < temp.length; j++) {
+						System.out.println("file: "+temp[i].getPath());
 		   				allFiles.add(temp[j]);										// Add file in folder to list
+						/*treeNodes[totalCount] = new DefaultMutableTreeNode(listOfFiles[i].getName());
+						treeNodes[backupCount].add(treeNodes[totalCount]);*/
 		   			}
-					System.out.println("Folder " + path+"\\"+listOfFiles[i].getName());
+					//treeNodes[backupCount2].add(treeNodes[backupCount]);												// guess I fucked something up here
+
 		   		} catch (Exception e) {
-		   			System.out.println("ERROR reading Folder " + path+"\\"+listOfFiles[i].getName());
+		   			System.out.println("ERROR reading Folder " + path+"/"+listOfFiles[i].getName());
 		   		}
+		   		//totalCount++;
 		   	} else {
 		    	allFiles.add(listOfFiles[i]);									// Add file to list
+				System.out.println("file: "+listOfFiles[i].getPath());
+				/*treeNodes[totalCount] = new DefaultMutableTreeNode(listOfFiles[i].getName());
+				treeNodes[0].add(treeNodes[totalCount]);
+				totalCount++;*/
 		   	}
 		}
 		return allFiles;
+		//return new Object[] {allFiles, treeNodes[0]};
 	}
 	public static TypeList loadTypes(List<File> allFiles) {
 		TypeList Types = TypeList.createTypeList(new String[][] {						// ending, category, relevance, quantity
@@ -142,6 +169,7 @@ public class General {
 			{"pdf", "Document", "50"},
 			{"xlsx", "Document", "60"},
 			{"one", "Document", "90"},
+			{"obj", "Document", "50"},
 			{"log", "Logfile", "100"},
 			{"bat", "Script", "60"},
 			{"php", "Script", "60"},
@@ -191,7 +219,7 @@ public class General {
 			}
 		}
 		if (!is_match) {																	// no match
-			result = 30;
+			result = 15;
 		}
 		return result;
 	}
@@ -260,11 +288,16 @@ public class General {
 		return result;
 	}
 	public static double round(double value, int length) {
-		double keks = Double.parseDouble((value+"").substring(0, (value+"").length()-3)+"12");
-		// System.out.println("original: " + keks);
-		String z = (keks+"000").substring(0, (((int) keks)+"").length()+length+1);
-		double yey = Double.parseDouble(z);
-		// System.out.println(value + " --> " + z + " --> " + yey);
+		double yey;
+		if ((value+"").equals("Infinity")) {
+			yey=value;
+		} else {
+			double keks = Double.parseDouble((value+"").substring(0, (value+"").length()-3)+"12");
+			// System.out.println("original: " + keks);
+			String z = (keks+"000").substring(0, (((int) keks)+"").length()+length+1);
+			yey = Double.parseDouble(z);
+			// System.out.println(value + " --> " + z + " --> " + yey);
+		}
 		return yey;
 	}
 }

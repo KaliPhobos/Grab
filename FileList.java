@@ -1,4 +1,4 @@
-package v00s09;
+package v00s10;
 
 public class FileList {
 	static FileItem[] Files;
@@ -40,6 +40,35 @@ public class FileList {
 		for(int pos=0;pos<Files.length;pos++) {
 			FileItem temp = getFile(pos);
 			temp.setNormalizedRelevance(temp.getTotalRelevance()*factor);
+		}
+	}
+	public void GuiMoveUp(int[] id) {
+		for(int i=0;i<id.length;i++) {
+			if (id[i]>0) {
+				FileItem temp = getFile(id[i]-1);
+				setFile(id[i]-1, getFile(id[i]));
+				setFile(id[i], temp);
+			}
+		}
+	}
+	public void GuiMoveDown(int[] id) {
+		for(int i=id.length-1;i>-1;i--) {
+			if (id[i]<Files.length-1) {
+				FileItem temp = getFile(id[i]+1);
+				setFile(id[i]+1, getFile(id[i]));
+				setFile(id[i], temp);
+			}
+		}
+	}
+	public void GuiMoveTop(int[] id) {
+		for(int i=0;i<id.length;i++) {
+			if (id[i]>0) {
+				for(int x=(id[i]);x>i+0;x--) {		// Simply moves to #0 and following positions
+					FileItem temp = getFile(x-1);	// Later implement it to be moved to (# if current job +1)
+					setFile(x-1, getFile(x));		// so it will be marked as next download
+					setFile(x, temp);
+				}
+			}
 		}
 	}
 }

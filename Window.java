@@ -1,9 +1,12 @@
-package v00s09;
+package v00s10;
 
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JTabbedPane;
 import javax.swing.JProgressBar;
 import javax.swing.JLabel;
@@ -17,6 +20,8 @@ import java.awt.FlowLayout;
 import javax.swing.JTree;
 import javax.swing.JScrollPane;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -29,6 +34,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.awt.event.ActionEvent;
 
@@ -43,6 +49,9 @@ public class Window extends JFrame implements Runnable {
 	public static TypeList MyTypeList = null;	// Holds ALL information about any file type
 	public static FileList MyFileList = null;	// Holds ALL information abut any found file
 	
+	public static int[] SelectedListItemIndex = null;
+	//List SelectedListItemIndex = Collections.synchronizedList(new ArrayList(0));
+	
 	public void run() {
 		this.setVisible(true);
 	}
@@ -52,8 +61,10 @@ public class Window extends JFrame implements Runnable {
 	 * Create the frame.
 	 */
 	public Window() {
-		String path = "/Users/p2/Downloads";
-		List<File> allFiles = General.loadFiles(path);	// "C:\\Users\\p2\\Downloads\\test"
+		String path = "/Users/p2/Documents";
+		/*Object[] result = General.loadFiles(path);
+		List<File> allFiles = (List<File>) result[0];*/
+		List<File> allFiles = General.loadFiles(path);			// "C:\\Users\\p2\\Downloads\\test"
 		MyTypeList = General.loadTypes(allFiles);
 		MyFileList = FileList.createFileList(General.getFileNames(path));
 		MyFileList.sort();
@@ -74,7 +85,7 @@ public class Window extends JFrame implements Runnable {
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		contentPane.add(panel_1, BorderLayout.SOUTH);
 		
-		JButton btnAnalyze = new JButton("Analyzeee");
+		JButton btnAnalyze = new JButton("Analyze");
 		btnAnalyze.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				listModel.clear();
@@ -112,16 +123,21 @@ public class Window extends JFrame implements Runnable {
 		Gui_FileList.setForeground(Color.WHITE);
 		scrollList.setBackground(Color.DARK_GRAY);
 		scrollList.setForeground(Color.WHITE);
-		/*FileList.setModel(new AbstractListModel() {
-			String[] values = {"Analyze first"};
-					public int getSize() {
-				return values.length;
-			}
-			public Object getElementAt(int index) {
-				return values[index];
-			}
-		});*/
 		scrollList.setBounds(144, 23, 415, 234);
+		//Gui_FileList.addFocusListener(new CustomFocusListener());				// ######################
+		Gui_FileList.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) {
+				if (!arg0.getValueIsAdjusting()) {
+					if( Gui_FileList.getSelectedIndex()!=-1) {	// Trigered when list is updating
+						//SelectedListItemIndex.clear();
+						SelectedListItemIndex = Gui_FileList.getSelectedIndices();	// Used to identify last selected Item for Move&Priorize buttons
+						System.out.println(getListContent(SelectedListItemIndex));
+
+					}
+				}
+			}
+		});
 		panel.add(scrollList);
 		
 		JCheckBox chckbxCopyExecutables = new JCheckBox("Copy Documents");
@@ -188,14 +204,17 @@ public class Window extends JFrame implements Runnable {
 		
 		JButton btnMoveUp = new JButton("Move Up");
 		btnMoveUp.setBounds(254, 263, 100, 23);
+		btnMoveUp.addActionListener(new ActionListenerMoveUp());
 		panel.add(btnMoveUp);
 		
 		JButton btnMoveDown = new JButton("Move Down");
 		btnMoveDown.setBounds(364, 263, 100, 23);
+		btnMoveDown.addActionListener(new ActionListenerMoveDown());
 		panel.add(btnMoveDown);
 		
 		JButton btnTopPriority = new JButton("Top Priority");
 		btnTopPriority.setBounds(144, 263, 100, 23);
+		btnTopPriority.addActionListener(new ActionListenerMoveTop());
 		panel.add(btnTopPriority);
 		
 		JButton btnCancel = new JButton("Cancel");
@@ -212,6 +231,9 @@ public class Window extends JFrame implements Runnable {
 		tabbedPane.addTab("New tab", null, panel_4, null);
 		panel_4.setLayout(null);
 		
+		/*Object[] results = General.loadFiles(path);
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode) result[1];
+		JTree tree = new JTree(root);*/
 		JTree tree = new JTree();
 		tree.setVisibleRowCount(18);
 		JScrollPane scrollTree = new JScrollPane(tree, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -233,5 +255,98 @@ public class Window extends JFrame implements Runnable {
 			listModel.addElement("("+(int) currentFile.getBasicRelevance()+"/"+(int) currentFile.getAdditionalRelevance()+"/"+(int) currentFile.getNormalizedRelevance()+")	"+currentFile.getPath() + "	("+currentFile.getSizeFormatted()+")");
 		}
 	}
+	/*class CustomFocusListener implements FocusListener{
+		public void focusGained(FocusEvent e) {
+			System.out.println(e.getComponent().getClass().getSimpleName() + " gained focus. ");
+		}
+		public void focusLost(FocusEvent e) {
+			System.out.println(e.getComponent().getClass().getSimpleName() + " lost focus. ");
+		}   
+	}*/
+	class ActionListenerMoveUp implements ActionListener {						// Move all selected Items by -1 (up)
+		public void actionPerformed(ActionEvent arg0) {
+			System.out.println("move up");
+			if (getMin(SelectedListItemIndex)>0) {								// Item can be moved up (id>0)
+				MyFileList.GuiMoveUp(SelectedListItemIndex);					// -> MOVE
+				for(int i=0;i<SelectedListItemIndex.length;i++) {				// shift IDs of selected items by -1
+					SelectedListItemIndex[i]--;
+				}
+				System.out.println(getListContent(SelectedListItemIndex));
+				listModel.clear();
+				FillFileList();
+				// focus, select
+			}
+		}
+	}
+	class ActionListenerMoveDown implements ActionListener {					// Move all selected Items by +1 (down)
+		public void actionPerformed(ActionEvent arg0) {
+			if (getMax(SelectedListItemIndex)<MyFileList.getLength()-1) {		// Item can be moved down (id<max)
+				MyFileList.GuiMoveDown(SelectedListItemIndex);					// -> MOVE
+				for(int i=0;i<SelectedListItemIndex.length;i++) {				// shift IDs of selected items by +1
+					SelectedListItemIndex[i]++;
+				}
+				//Gui_FileList.setSelectedIndices(SelectedListItemIndex);
 
+				System.out.println(getListContent(SelectedListItemIndex));
+				listModel.removeAllElements();									// works just fine as well, but doesnt fix the bug with "setSelectedIndices"
+				FillFileList();
+				// Gui_FileList.ensureIndexIsVisible(SelectedListItemIndex[0]);	// rel: https://java.wekeepcoding.com/article/11947811/Why+JList+uses+int%5b%5d+to+select+indices+when+it+require+a+Set+of+Integer%3f
+			}
+		}
+	}
+	class ActionListenerMoveTop implements ActionListener {
+		public void actionPerformed(ActionEvent arg0) {
+			if (getMin(SelectedListItemIndex)>0) {
+				MyFileList.GuiMoveTop(SelectedListItemIndex);
+				for(int i=0;i<SelectedListItemIndex.length;i++) {
+					SelectedListItemIndex[i]= i;
+				}
+				System.out.println(getListContent(SelectedListItemIndex));
+				listModel.clear();
+				FillFileList();
+				// focus, select
+			}
+		}
+	}
+	public static int getMin(int[] num) {
+		int min = num[0];
+		for(int i=0;i<num.length;i++) {
+			if(num[i]<min) {
+				min=num[i];
+			}
+		}
+		return min;
+	}
+	public static int getMin(ArrayList num) {
+		int min = (int) num.get(0);
+		for(int x=0;x<num.size();x++) {
+			if((int)num.get(x)<min) {
+				min=(int)num.get(x);
+			}
+		}
+		return min;
+	}
+	public static int getMax(int[] num) {
+		int max = num[0];
+		for(int i=0;i<num.length;i++) {
+			if(num[i]>max) {
+				max=num[i];
+			}
+		}
+		return max;
+	}
+	public String getListContent(int[] values) {
+		String result = "selected:";
+		for(int x=0;x<values.length;x++) {
+			result = result + " " + values[x];
+		}
+		return result;
+	}
+	public String getListContent(ArrayList values) {
+		String result = "selected:";
+		for(int x=0;x<values.size();x++) {
+			result = result + " " + values.get(x);
+		}
+		return result;
+	}
 }
