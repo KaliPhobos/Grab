@@ -1,4 +1,4 @@
-package v00s13;
+package v00s14;
 
 import java.io.File;
 import java.io.FileReader;
@@ -153,7 +153,7 @@ public class General {
 	}
 	public static TypeList loadTypes(List<File> allFiles) {
 		TypeList Types = TypeList.createTypeList(new String[][] {						// ending, category, relevance, quantity
-			{"vcf", "PersonalData", "100"},
+			{"vcf", "Contacts", "100"},
 			{"jpg", "Image", "90"},
 			{"jpeg", "Image", "90"},
 			{"png", "Image", "100"},
@@ -161,7 +161,7 @@ public class General {
 			{"bmp", "Image", "20"},			// Name: priority on files
 			{"ico", "Image", "20"},			// Meta: priority on 10 most recent changed files
 			{"doc", "Document", "80"},		// Meta: priority on any files changed after their including folder was created
-			{"docx", "Document", "80"},		// Size: sort by difference to 3MB (sweetspot 0.1-5MB files)
+			{"docx", "Document", "80"},
 			{"ppt", "Document", "70"},		// Hash: save hashes of any files: EXE, PDF, MKV, MP4, AVI, MOV
 			{"pages", "Document", "80"},
 			{"pptx", "Document", "70"},
@@ -174,15 +174,16 @@ public class General {
 			{"one", "Document", "99"},
 			{"obj", "Document", "50"},
 			{"xml", "Document", "60"},
+			{"sql", "Document", "90"},
 			{"log", "Logfile", "100"},
 			{"bat", "Script", "60"},
 			{"php", "Script", "60"},
 			{"js", "Script", "60"},
 			{"html", "Script", "50"},
 			{"css", "Script", "50"},
-			{"sql", "Table", "90"},
 			{"mp4", "Video", "63"},
 			{"mkv", "Video", "58"},
+			{"m4v", "Video", "58"},
 			{"avi", "Video", "50"},
 			{"flv", "Video", "50"},
 			{"wav", "Audio", "70"},
@@ -197,7 +198,9 @@ public class General {
 			{"iso", "Archive", "70"},
 			{"dll", "Binary", "8"},
 			{"ini", "Binary", "12"},
-			{"tmp", "Binary", "10"}
+			{"tmp", "Binary", "10"},
+			{"ttf", "Font", "20"},
+			{"fon", "Font", "20"}
 		});
 		for (int i = 0; i < allFiles.size(); i++) {
 	        String[] temp = allFiles.get(i).getName().split("\\.");
@@ -232,10 +235,10 @@ public class General {
 	public static double getAdditionalRelevance(double size) {
 		double additionalRelevance = 0.0;
 		if(size==0.0) {										// empty file
-			additionalRelevance = 10.0;
+			additionalRelevance = 20.0;
 		}
 		if (size>0 && size<500000.0) {						// less than 0.5MB
-			additionalRelevance = (size/500000.0)*50.0+50.0;
+			additionalRelevance = (size/500000.0)*40.0+60.0;
 		}
 		if (size>500000.0 && size<12000000.0) {	// Sweet spot 0.5-12MB
 			additionalRelevance = 99.9;
@@ -251,6 +254,23 @@ public class General {
 		}
 		//System.out.println(size+"	 -->	"+additionalRelevance);
 		return additionalRelevance;
+	}
+	public static int getNameRelevance(String filename, String ending, String category) {	// never called
+		int result = 50;			// average
+		if (filename.startsWith("._")) {
+			result = result -40;
+		}
+		if (category.equals("Image") && filename.startsWith("IMG_")) {
+			result = result +40;
+		}
+		if ((filename+ending).equals("readme.txt")) {
+			result = result -20;
+		}
+		if (filename.contains("pass")) {
+			result = result +40;
+		}
+		
+		return result;
 	}
 	public static String FormatSize(double size) {
 		String result;

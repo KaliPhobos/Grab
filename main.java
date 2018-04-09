@@ -1,10 +1,9 @@
-package v00s13;
+package v00s14;
 
 
 import java.awt.Color;
 
 public class main {
-
 
 	public static void main(String[] args) throws Exception {
 		String path = "C:\\Program Files";	//"/Users/p2";
@@ -13,7 +12,7 @@ public class main {
 	}
 	
 
-
+	
 	
 	/*
 	 * running ...

@@ -1,4 +1,4 @@
-package v00s13;
+package v00s14;
 
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
@@ -84,17 +84,18 @@ public class Window extends JFrame implements Runnable {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 600, 400);
 		contentPane = new JPanel();
+		contentPane.setBackground(Color.GRAY);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		contentPane.setLayout(new BorderLayout(0, 0));
+		contentPane.setLayout(null);
 		
-		JPanel panel_1 = new JPanel();
-		panel_1.setBackground(Color.DARK_GRAY);
-		FlowLayout flowLayout = (FlowLayout) panel_1.getLayout();
-		flowLayout.setAlignment(FlowLayout.LEFT);
-		contentPane.add(panel_1, BorderLayout.SOUTH);
+		JPanel panel_bottom = new JPanel();
+		panel_bottom.setBounds(0, 333, 584, 29);
+		panel_bottom.setBackground(Color.DARK_GRAY);
+		contentPane.add(panel_bottom);
 		
 		JButton btnAnalyze = new JButton("Analyze");
+		btnAnalyze.setBounds(0, 3, 100, 23);
 		btnAnalyze.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				//listModel.clear();
@@ -107,28 +108,51 @@ public class Window extends JFrame implements Runnable {
 				// progressBar.	// how to set data?
 			}
 		});
-		panel_1.add(btnAnalyze);
+		panel_bottom.setLayout(null);
+		panel_bottom.add(btnAnalyze);
 		
 		JButton btnStartGrab = new JButton("Start Grab");
-		panel_1.add(btnStartGrab);
+		btnStartGrab.setBounds(200, 3, 100, 23);
+		panel_bottom.add(btnStartGrab);
 		
 		JButton btnDeleteAll = new JButton("Delete All");
-		panel_1.add(btnDeleteAll);
+		btnDeleteAll.setBounds(300, 3, 100, 23);
+		panel_bottom.add(btnDeleteAll);
 		
-		JButton btnAbort = new JButton("Abort");
-		panel_1.add(btnAbort);
+		JButton btnAbort = new JButton("Destination");
+		btnAbort.setBounds(100, 3, 100, 23);
+		panel_bottom.add(btnAbort);
 		
 		progressBar = new JProgressBar();
+		progressBar.setBounds(405, 16, 110, 9);
 		progressBar.setBackground(Color.BLACK);
-		panel_1.add(progressBar);
+		panel_bottom.add(progressBar);
+		
+		JLabel lblNewLabel = new JLabel("New label");
+		lblNewLabel.setForeground(Color.GREEN);
+		lblNewLabel.setBounds(405, 3, 110, 14);
+		panel_bottom.add(lblNewLabel);
+		
+		JButton button = new JButton("Abort");
+		button.setBounds(519, 3, 65, 23);
+		panel_bottom.add(button);
+		
+		JProgressBar progressBar_1 = new JProgressBar();
+		progressBar_1.setBounds(5, 324, 574, 9);
+		contentPane.add(progressBar_1);
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.setBounds(5, 5, 574, 319);
 		contentPane.add(tabbedPane);
 		
 		JPanel panel = new JPanel();
 		panel.setBackground(new Color(192, 192, 192));
 		tabbedPane.addTab("Manage Files", null, panel, null);
 		panel.setLayout(null);
+		
+		JLabel lblThisIsA = new JLabel("Files ordered by individual priority (Will be copied in this order)");
+		lblThisIsA.setBounds(144, 4, 415, 14);
+		panel.add(lblThisIsA);
 		
 		listModel = new DefaultListModel();
 		FillFileList();
@@ -183,10 +207,6 @@ public class Window extends JFrame implements Runnable {
 		checkBox_3.setBounds(5, 107, 133, 18);
 		panel.add(checkBox_3);
 		
-		JLabel lblThisIsA = new JLabel("Files ordered by individual priority (Will be copied in this order)");
-		lblThisIsA.setBounds(144, 4, 415, 14);
-		panel.add(lblThisIsA);
-		
 		JCheckBox chckbxCopyScripts = new JCheckBox("Copy Scripts");
 		chckbxCopyScripts.setBackground(new Color(192, 192, 192));
 		chckbxCopyScripts.setSelected(true);
@@ -211,8 +231,20 @@ public class Window extends JFrame implements Runnable {
 		chckbxCopyLogfiles.setBounds(5, 191, 133, 18);
 		panel.add(chckbxCopyLogfiles);
 		
+		JCheckBox chckbxCopyContacts = new JCheckBox("Copy Contacts");
+		chckbxCopyContacts.setBackground(new Color(192, 192, 192));
+		chckbxCopyContacts.setSelected(true);
+		chckbxCopyContacts.setBounds(5, 212, 133, 18);
+		panel.add(chckbxCopyContacts);
+		
+		JCheckBox chckbxCopyFonts = new JCheckBox("Copy Fonts");
+		chckbxCopyFonts.setBackground(new Color(192, 192, 192));
+		chckbxCopyFonts.setSelected(true);
+		chckbxCopyFonts.setBounds(5, 233, 133, 18);
+		panel.add(chckbxCopyFonts);
+		
 		adressField = new JTextField(InputParam_path);				// Insert Window-Thread input parameter
-		adressField.setBounds(5, 220, 133, 18);
+		adressField.setBounds(5, 266, 133, 20);
 		chckbxCopyLogfiles.setBackground(new Color(192, 192, 192));
 		panel.add(adressField);
 		
@@ -238,6 +270,10 @@ public class Window extends JFrame implements Runnable {
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.setBounds(474, 263, 85, 23);
 		panel.add(btnCancel);
+		
+		JLabel lblTargetDrive = new JLabel("Target Drive:");
+		lblTargetDrive.setBounds(5, 253, 129, 14);
+		panel.add(lblTargetDrive);
 		
 		JPanel panel_2 = new JPanel();
 		tabbedPane.addTab("Statistics", null, panel_2, null);
@@ -278,6 +314,7 @@ public class Window extends JFrame implements Runnable {
 		
 		
 	}
+	@SuppressWarnings("unchecked")		//listModel is initially NULL
 	public void FillFileList() {
 		String result;
 		if (initial==false) {								// To avoid bug: Will else reduce item height to fit additional items but only in initial run
