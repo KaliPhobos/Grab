@@ -1,4 +1,4 @@
-package v00s08;
+package v00s09;
 
 
 import java.awt.Color;
@@ -8,7 +8,7 @@ public class main {
 
 
 	public static void main(String[] args) throws Exception {
-		
+		System.out.println("hallo");
 		(new Thread(new Window())).start();
 	}
 	

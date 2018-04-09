@@ -1,18 +1,15 @@
-package v00s08;
+package v00s09;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class General {
-	public static String[][] Types = null;
+	
+	
+	
 	public static FileWriter createWriter(String path) {
 		FileWriter writer = null;
 		try {
@@ -43,8 +40,9 @@ public class General {
 		byte[] encoded = Files.readAllBytes(Paths.get(path));
 		return new String(encoded, encoding);
 	}*/
-	public static void createFileList(FileWriter writer) {
-		List<File> allFiles = loadFiles("C:\\xampp");	// "C:\\Users\\p2\\Downloads\\test"
+	public static void createFileList(FileWriter writer, String _path) {
+		
+		List<File> allFiles = loadFiles(_path);	// "C:\\Users\\p2\\Downloads\\test"
 		for (int i = 0; i < allFiles.size(); i++) {
 			String path = allFiles.get(i).getAbsolutePath();
 			try {
@@ -56,7 +54,7 @@ public class General {
 		}
 	}
 	
-	public static int FileCountLines(String filename) throws IOException {
+	/*public static int FileCountLines(String filename) throws IOException {
 	    InputStream is = new BufferedInputStream(new FileInputStream(filename));
 	    try {
 	        byte[] c = new byte[1024];
@@ -76,8 +74,8 @@ public class General {
 	    } finally {
 	        is.close();
 	    }
-	}
-	public static String[] FileToStringArray(String path) {
+	}*/
+	/*public static String[] FileToStringArray(String path) {
 		String[] lines = null;
 		try {
 			lines = new String[General.FileCountLines(path)+1];
@@ -93,12 +91,13 @@ public class General {
 			e.printStackTrace();
 		}
 		return lines;
-	}
-	public static String[] getFileNames(String path) {
+	}*/
+	public static String[][] getFileNames(String path) {
 		List<File> allFiles = loadFiles(path);
-		String[] FullNames = new String[allFiles.size()];
+		String[][] FullNames = new String[allFiles.size()][2];
 		for (int i = 0; i < allFiles.size(); i++) {
-			FullNames[i] = allFiles.get(i).getPath();
+			FullNames[i][0] = allFiles.get(i).getPath();
+			FullNames[i][1] = allFiles.get(i).getName();
 		}
 		return FullNames;
 	}
@@ -116,7 +115,6 @@ public class General {
 					System.out.println("Folder " + path+"\\"+listOfFiles[i].getName());
 		   		} catch (Exception e) {
 		   			System.out.println("ERROR reading Folder " + path+"\\"+listOfFiles[i].getName());
-		   			//e.printStackTrace();
 		   		}
 		   	} else {
 		    	allFiles.add(listOfFiles[i]);									// Add file to list
@@ -124,119 +122,118 @@ public class General {
 		}
 		return allFiles;
 	}
-	public static String[][] loadTypes(List<File> allFiles) {
-		String[][] Types = {						// ending, category, relevance, quantity
-				{"jpg", "Image", "90", "0"},
-				{"png", "Image", "100", "0"},
-				{"gif", "Image", "30", "0"},		// Name: priority on files named IMG_???? or IMG_?????
-				{"bmp", "Image", "20", "0"},		// Name: priority on files
-				{"ico", "Image", "20", "0"},		// Meta: priority on 10 most recent changed files
-				{"doc", "Document", "80", "0"},		// Meta: priority on any files changed after their including folder was created
-				{"docx", "Document", "80", "0"},	// Size: sort by difference to 3MB (sweetspot 0.1-5MB files)
-				{"ppt", "Document", "70", "0"},		// Hash: save hashes of any files: EXE, PDF, MKV, MP4, AVI, MOV
-				{"pptx", "Document", "70", "0"},
-				{"txt", "Document", "90", "0"},
-				{"conf", "Document", "30", "0"},
-				{"readme", "Document", "40", "0"},
-				{"log", "Logfile", "100", "0"},
-				{"bat", "Script", "60", "0"},
-				{"php", "Script", "60", "0"},
-				{"js", "Script", "60", "0"},
-				{"html", "Script", "50", "0"},
-				{"css", "Script", "50", "0"},
-				{"sql", "Table", "90", "0"},
-				{"mp4", "Video", "60", "0"},
-				{"mkv", "Video", "60", "0"},
-				{"avi", "Video", "50", "0"},
-				{"exe", "Executable", "30", "0"},
-				{"zip", "Archive", "60", "0"},
-				{"rar", "Archive", "60", "0"},
-				{"7zip", "Archive", "60", "0"},
-				{"dll", "Binary", "10", "0"},
-				{"ini", "Binary", "10", "0"},
-				{"tmp", "Binary", "10", "0"}
-				};
-		for (int i = 0; i < allFiles.size()-1; i++) {
-	        System.out.println("File " + allFiles.get(i).getName());
+	public static TypeList loadTypes(List<File> allFiles) {
+		TypeList Types = TypeList.createTypeList(new String[][] {						// ending, category, relevance, quantity
+			{"jpg", "Image", "90"},
+			{"jpeg", "Image", "90"},
+			{"png", "Image", "100"},
+			{"gif", "Image", "30"},			// Name: priority on files named IMG_???? or IMG_?????
+			{"bmp", "Image", "20"},			// Name: priority on files
+			{"ico", "Image", "20"},			// Meta: priority on 10 most recent changed files
+			{"doc", "Document", "80"},		// Meta: priority on any files changed after their including folder was created
+			{"docx", "Document", "80"},		// Size: sort by difference to 3MB (sweetspot 0.1-5MB files)
+			{"ppt", "Document", "70"},		// Hash: save hashes of any files: EXE, PDF, MKV, MP4, AVI, MOV
+			{"pages", "Document", "80"},
+			{"pptx", "Document", "70"},
+			{"txt", "Document", "90"},
+			{"odt", "Document", "90"},
+			{"conf", "Document", "30"},
+			{"readme", "Document", "40"},
+			{"pdf", "Document", "50"},
+			{"xlsx", "Document", "60"},
+			{"one", "Document", "90"},
+			{"log", "Logfile", "100"},
+			{"bat", "Script", "60"},
+			{"php", "Script", "60"},
+			{"js", "Script", "60"},
+			{"html", "Script", "50"},
+			{"css", "Script", "50"},
+			{"sql", "Table", "90"},
+			{"mp4", "Video", "60"},
+			{"mkv", "Video", "60"},
+			{"avi", "Video", "50"},
+			{"flv", "Video", "50"},
+			{"wav", "Audio", "70"},
+			{"mp3", "Audio", "70"},
+			{"exe", "Executable", "30"},
+			{"dmg", "Executable", "30"},
+			{"msi", "Executable", "30"},
+			{"zip", "Archive", "60"},
+			{"rar", "Archive", "60"},
+			{"7zip", "Archive", "60"},
+			{"tar.gz", "Archive", "60"},
+			{"iso", "Archive", "70"},
+			{"dll", "Binary", "10"},
+			{"ini", "Binary", "10"},
+			{"tmp", "Binary", "10"}
+		});
+		for (int i = 0; i < allFiles.size(); i++) {
 	        String[] temp = allFiles.get(i).getName().split("\\.");
 	        String Ending = temp[temp.length-1];
-	        for(int _x = 0;_x<Types.length;_x++) {
-	        	if(Ending.equals(Types[_x][0])) {
-	        		Types[_x][3] = (Integer.parseInt(Types[_x][3])+1)+"";		// Count 1 up
+	        for(int _x=0;_x<Types.getLength();_x++) {
+	        	if(Ending.equals(Types.getType(_x).getEnding())) {
+	        		Types.getType(_x).increaseQuantity(1);
+	        		//Types.getType(_x).setQuantity((Integer.parseInt(Types[_x][3])+1));		// Count 1 up
 	        	}
 	        }
 	    }
 		return Types;
 	}
-	public static String[][] GetAnalyzedData(String path) {
-		List<File> allFiles = loadFiles(path);	// "C:\\Users\\p2\\Downloads\\test"
-		Types = loadTypes(allFiles);
-		String[][] Files = new String[allFiles.size()][7];		// FileName, FullPath, FileSize, Relevance, AdditionalRelevance, TotalRelevance, Type
-		for (int i = 0; i < allFiles.size(); i++) {
-			String[] temp = allFiles.get(i).getName().split("\\.");
-			String Ending = temp[temp.length-1];
-			boolean is_match = false;
-			int Relevance = 0;
-			int AdditionalRelevance = 0;
-			for(int _x = 0;_x<Types.length;_x++) {						// Compare file endings
-				if(Ending.toLowerCase().equals(Types[_x][0])) {			// match
-					Files[i][6] = _x+"";
-					is_match = true;
-					int imp = Integer.parseInt(Types[_x][2]);
-					Relevance = Math.round(((imp*imp)/(Integer.parseInt(Types[_x][3])+1))/10);
-					//Files[i][0] = "File " + allFiles.get(i).getName() + " is of type " + Types[_x][1] + "(priority "+Types[_x][2]+"%) and got the individual Importance of " + Importance;
-					//System.out.println(Files[i][0]+"\n"+Files[i][1]+"\n"+Files[i][2]+"\n"+Files[i][3]+"\n"+Files[i][4]);
-				}
-			}
-			if (!is_match) {											// no match
-				Relevance = 30;
-				//System.out.println(Ending);
-				Files[i][6] = "";
-			}
-			AdditionalRelevance = 0;
-			int size = (int) allFiles.get(i).length();
-			if (size<1000000) {						// less than 1MB
-				AdditionalRelevance = Math.round((size/100000)*100);
-			}
-			if (size>1000000 && size<12000000) {	// Sweet spot 1-12MB
-				AdditionalRelevance = 100;
-			}
-			if (size>12000000 && size<100000000) {	//large files (12-100MB)
-				AdditionalRelevance = ((size-12000000)/88000000)*100;
-			}
-			if (size>100000000) {					// fat ones, beyond 100MB
-				AdditionalRelevance = 0;
-			}
-			Files[i] = new String[] {allFiles.get(i).getName(), allFiles.get(i).getPath(), allFiles.get(i).length()+"", Relevance+"", AdditionalRelevance + "", Math.round(Relevance*0.7 + AdditionalRelevance*0.3)+"", Files[i][6]};
-			if (Files[i][6]!="") {
-				System.out.println("File " + allFiles.get(i).getName() + " is of type " + Types[Integer.parseInt(Files[i][6])][1] + "(priority "+Types[Integer.parseInt(Files[i][6])][2]+"%), has a size of " + Files[i][2] + " (Additional Relevance " + Integer.parseInt(Files[i][5]) + "%) and got the individual Importance of " + Relevance);
-			} else {
-				System.out.println("File " + allFiles.get(i).getName() + " is of unknown type (priority 30%%), has a size of " + Files[i][2] + " (Additional Relevance " + Integer.parseInt(Files[i][5]) + "%)  and got the individual Importance of " + Relevance);
+	public static double getBasicRelevance(String ending) {
+		double result = 0;
+		boolean is_match = false;
+		for(int _x = 0;_x<Window.MyTypeList.getLength();_x++) {											// Compare file endings
+			if(ending.toLowerCase().equals(Window.MyTypeList.getType(_x).getEnding())) {				// match
+				is_match = true;
+				double _quantity = Window.MyTypeList.getType(_x).getQuantity();
+				double _typeRelevance = Window.MyTypeList.getType(_x).getTypeRelevance();
+				result = ((_typeRelevance*_typeRelevance)/(_quantity)+1.0)/100.0-0.01;	// gedeckelt auf 100% - evtl unsaubere ergebnisse?			######################################
 			}
 		}
-		return Files;
+		if (!is_match) {																	// no match
+			result = 30;
+		}
+		return result;
 	}
-
-	public static String[][] OrderStringArrayBy(String[][] input, int parameter) {
-		/*String[][] result = new String[input.length][input[0].length];
-		for(int x=0;x<input.length;x++) {
-			int max = 0;
-			int num = 0;
-			for(int y=0;y<input.length;y++) {
-				if (input[y][parameter]!=null) {
-					int res = Integer.parseInt(input[y][parameter]);
-					if (res>max) {
-						max = res;
-						num = y;
-						System.out.println("item " + num + "has relevance of " + max);
-					}
-				}
-			}
-			for(int y=0;y<input[0].length;y++) {
-				result[x][y] = input[num][y];
-			}
+	public static double getAdditionalRelevance(double size) {
+		double additionalRelevance = 0.0;
+		if(size==0.0) {
+			additionalRelevance = 1.0;
 		}
-		return result;*/
+		if (size>0 && size<500000.0) {						// less than 0.5MB
+			additionalRelevance = (size/1000000.0)*100.0+50.0;
+		}
+		if (size>500000.0 && size<12000000.0) {	// Sweet spot 1-12MB
+			additionalRelevance = 100.0;
+		}
+		if (size>12000000.0 && size<100000000.0) {	//large files (12-100MB)
+			additionalRelevance = ((size-12000000.0)/88000000.0)*100.0;
+		}
+		if (size>100000000.0) {					// fat ones, beyond 100MB
+			additionalRelevance = 0.0;
+		}
+		return additionalRelevance;
+	}
+	public static String FormatSize(double size) {
+		String result;
+		if (size<1000) {
+			result = (int) size+" Byte";
+		} else if(size<1000000) {
+			result = (((double) Math.round(size/10))/100)+"KB";
+		} else if(size<1000000000) {
+			result = (((double) Math.round(size/10000))/100)+"MB";
+		} else if(size<1000000000000.0) {
+			result = (((double) Math.round(size/10000000))/100)+"GB";
+		} else if(size<1000000000000000.0) {
+			result = (((double) Math.round(size/10000000000.0))/100)+"TB";
+		} else if(size<1000000000000000000.0) {
+			result = (((double) Math.round(size/10000000000000.0))/100)+"PB";
+		} else {
+			result = "fuck you";
+		}
+		return result;
+	}
+	public static String[][] OrderStringArrayBy(String[][] input, int parameter) {
 		for(int x=0;x<input.length;x++) {
 			int max = 0;
 			int num = 0;
@@ -249,11 +246,9 @@ public class General {
 					}
 				}
 			}
-			//System.out.println("item " + num + "has relevance of " + max);
 			String[] temponary = input[num];
 			input[num] = input[x];
 			input[x] = temponary;
-			System.out.println("File " + input[x][1] + " is of relevance " + input[x][3]);
 		}
 		return input;
 	}
@@ -263,5 +258,13 @@ public class General {
 			result[x] = input[x][row];
 		}
 		return result;
+	}
+	public static double round(double value, int length) {
+		double keks = Double.parseDouble((value+"").substring(0, (value+"").length()-3)+"12");
+		// System.out.println("original: " + keks);
+		String z = (keks+"000").substring(0, (((int) keks)+"").length()+length+1);
+		double yey = Double.parseDouble(z);
+		// System.out.println(value + " --> " + z + " --> " + yey);
+		return yey;
 	}
 }

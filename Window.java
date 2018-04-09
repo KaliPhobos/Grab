@@ -1,4 +1,4 @@
-package v00s08;
+package v00s09;
 
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
@@ -38,19 +38,29 @@ public class Window extends JFrame implements Runnable {
 	private JPanel contentPane;
 	private DefaultListModel listModel = null;
 	
-	public static JList FileList = null;
-	/**
-	 * Launch the application.
-	 */
+	public static JList Gui_FileList = null;
+	
+	public static TypeList MyTypeList = null;	// Holds ALL information about any file type
+	public static FileList MyFileList = null;	// Holds ALL information abut any found file
+	
 	public void run() {
-		Window frame = new Window();
-		frame.setVisible(true);
+		this.setVisible(true);
 	}
+
 
 	/**
 	 * Create the frame.
 	 */
 	public Window() {
+		String path = "/Users/p2/Downloads";
+		List<File> allFiles = General.loadFiles(path);	// "C:\\Users\\p2\\Downloads\\test"
+		MyTypeList = General.loadTypes(allFiles);
+		MyFileList = FileList.createFileList(General.getFileNames(path));
+		MyFileList.sort();
+		MyFileList.normalize();
+		
+
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 600, 400);
 		contentPane = new JPanel();
@@ -64,15 +74,11 @@ public class Window extends JFrame implements Runnable {
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		contentPane.add(panel_1, BorderLayout.SOUTH);
 		
-		JButton btnAnalyze = new JButton("Analyze");
+		JButton btnAnalyze = new JButton("Analyzeee");
 		btnAnalyze.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//String[] FileNames = General.FileToStringArray("src/Files.txt");
-				//String[] FileNames = General.getFileNames("C:\\xampp");
-				String[] FileNames = General.GetStringArrayRow(General.OrderStringArrayBy(General.GetAnalyzedData("C:\\xampp"), 5), 1);
-				for(int x=0;x<FileNames.length;x++) {
-					listModel.addElement((FileNames[x]));
-				}
+				listModel.clear();
+				FillFileList();
 			}
 		});
 		panel_1.add(btnAnalyze);
@@ -98,15 +104,12 @@ public class Window extends JFrame implements Runnable {
 		tabbedPane.addTab("Manage Files", null, panel, null);
 		panel.setLayout(null);
 		
-		String[] FileNames = General.GetStringArrayRow(General.OrderStringArrayBy(General.GetAnalyzedData("C:\\xampp"), 5), 1);
 		listModel = new DefaultListModel();
-		for(int x=0;x<FileNames.length;x++) {
-			listModel.addElement((FileNames[x]));
-		}
-		JList FileList = new JList(listModel);
-		JScrollPane scrollList = new JScrollPane(FileList, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		FileList.setBackground(Color.DARK_GRAY);
-		FileList.setForeground(Color.WHITE);
+		FillFileList();
+		JList Gui_FileList = new JList(listModel);
+		JScrollPane scrollList = new JScrollPane(Gui_FileList, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		Gui_FileList.setBackground(Color.DARK_GRAY);
+		Gui_FileList.setForeground(Color.WHITE);
 		scrollList.setBackground(Color.DARK_GRAY);
 		scrollList.setForeground(Color.WHITE);
 		/*FileList.setModel(new AbstractListModel() {
@@ -223,6 +226,12 @@ public class Window extends JFrame implements Runnable {
 		
 		
 		
+	}
+	public void FillFileList() {
+		for(int x=0;x<MyFileList.getLength();x++) {
+			FileItem currentFile = FileList.getFile(x);
+			listModel.addElement("("+(int) currentFile.getBasicRelevance()+"/"+(int) currentFile.getAdditionalRelevance()+"/"+(int) currentFile.getNormalizedRelevance()+")	"+currentFile.getPath() + "	("+currentFile.getSizeFormatted()+")");
+		}
 	}
 
 }
