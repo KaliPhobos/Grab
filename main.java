@@ -1,4 +1,4 @@
-package v00s04;
+package v00s05;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -15,8 +15,8 @@ public class main {
 	public static String[][] Types = null;
 
 
-	public static void main(String[] args) {
-		List<File> allFiles = loadFiles("C:\\Users\\p2\\Downloads");	// "C:\\Users\\p2\\Downloads\\test"
+	public static void main(String[] args) throws Exception {
+		List<File> allFiles = loadFiles("C:\\xampp");	// "C:\\Users\\p2\\Downloads\\test"
 		Types = loadTypes(allFiles);
 		String[][] Files = new String[allFiles.size()][5];		// FileName, FullPath, FileSize, Relevance, AdditionalRelevance
 		for (int i = 0; i < allFiles.size(); i++) {
@@ -39,14 +39,14 @@ public class main {
 		}
 		
 		
-		
-		GUI.CreateGui();
-		JFrame frame = new JFrame();
+		(new Thread(new Window())).start();
+		/*JFrame frame = new JFrame();
 		frame.getContentPane().add(new PieDiagramm(getSlices(Types, 3)));
 		frame.getContentPane().add(new PieDiagramm(getSlices(Types, 2)));
 		frame.setSize(600, 400);
 		frame.setLayout(new GridLayout(2, 3));
-		frame.setVisible(true);
+		frame.setVisible(true);*/
+		
 	}
 	
 

@@ -1,4 +1,4 @@
-package v00s04;
+package v00s05;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
