@@ -1,4 +1,4 @@
-package v00s11;
+package v00s12;
 
 import java.io.File;
 import java.io.FileReader;
@@ -128,7 +128,9 @@ public class General {
 					backupCount = totalCount;*/
 					for (int j = 0; j < temp.length; j++) {
 						System.out.println("file: "+temp[i].getPath());
-		   				allFiles.add(temp[j]);										// Add file in folder to list
+						if (!temp[j].isDirectory()) {							// No folders will show up in Results
+							allFiles.add(temp[j]);								// Add file in folder to list
+						}
 						/*treeNodes[totalCount] = new DefaultMutableTreeNode(listOfFiles[i].getName());
 						treeNodes[backupCount].add(treeNodes[totalCount]);*/
 		   			}
@@ -201,6 +203,7 @@ public class General {
 	        for(int _x=0;_x<Types.getLength();_x++) {
 	        	if(Ending.equals(Types.getType(_x).getEnding())) {
 	        		Types.getType(_x).increaseQuantity(1);
+	        		Types.getType(_x).increaseSize(allFiles.get(i).length()); 	// SHOULD ADD SIZE NOT LENGTH OF PATH
 	        		//Types.getType(_x).setQuantity((Integer.parseInt(Types[_x][3])+1));		// Count 1 up
 	        	}
 	        }

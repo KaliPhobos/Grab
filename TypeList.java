@@ -1,15 +1,16 @@
-package v00s11;
+package v00s12;
 
 public class TypeList {
 	
 	static TypeItem[] Types;
+	static String analizedData;
 	static int c_Files;
 	int length;
 	public TypeList(String[][] TypesFound) {
 		this.length = TypesFound.length;
 		this.Types = new TypeItem[TypesFound.length];
 		for(int x=0;x<TypesFound.length;x++) {
-			this.Types[x] = TypeItem.createType(TypesFound[x][0], TypesFound[x][1], Integer.parseInt(TypesFound[x][2]), 0);
+			this.Types[x] = TypeItem.createType(TypesFound[x][0], TypesFound[x][1], Integer.parseInt(TypesFound[x][2]), 0, 0);
 		}
 	}
 	public static TypeList createTypeList(String[][] TypesFound) {
@@ -54,12 +55,23 @@ public class TypeList {
 			setType(pos, backup);					//backup	->	pos
 		}
 	}
-	public static void analyze() {
-		System.out.println("Out of "+c_Files+" total files:");
+	public static String analize() {
+		analizedData = "Out of "+c_Files+" total files:";
 		for(int x=0;x<Types.length;x++) {
 			TypeItem temp = Types[x];
-			System.out.println(temp.getQuantity()+" "+temp.getEnding().toUpperCase()+"-files ("+((100*temp.getQuantity())/c_Files)+"%)");
+			String substring = null;
+			int quantity = temp.getQuantity();
+			if (quantity>0) {
+				if (quantity==1) {
+					substring = "";
+				} else {
+					substring = "s";
+				}
+				analizedData+="\n"+temp.getQuantity()+" "+temp.getEnding().toUpperCase()+"-file"+substring+" ("+((100*temp.getQuantity())/c_Files)+"%) with a total of "+General.FormatSize((double) temp.getSize());
+			}
 		}
+		System.out.println(analizedData);
+		return analizedData;
 	}
 
 }

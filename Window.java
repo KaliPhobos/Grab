@@ -1,4 +1,4 @@
-package v00s11;
+package v00s12;
 
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
@@ -8,6 +8,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JProgressBar;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -45,6 +46,8 @@ public class Window extends JFrame implements Runnable {
 	private DefaultListModel listModel = null;
 	
 	public static JList Gui_FileList = null;
+	public static JTextArea txtBox = null;
+	public static JProgressBar progressBar = null;
 	
 	public static TypeList MyTypeList = null;	// Holds ALL information about any file type
 	public static FileList MyFileList = null;	// Holds ALL information abut any found file
@@ -71,7 +74,7 @@ public class Window extends JFrame implements Runnable {
 		FileList.normalize();
 		TypeList.sort();
 		
-		TypeList.analyze();
+		//txtBox.setText(TypeList.analize());			// Can't automate at startup since txtBox-element is still NULL
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 600, 400);
@@ -94,6 +97,8 @@ public class Window extends JFrame implements Runnable {
 				FileList.sort();
 				FileList.normalize();
 				FillFileList();																// ############ in usecase no new files will ever pop up so this button is only ment to reset any changes
+				txtBox.setText(TypeList.analize());
+				// progressBar.	// how to set data?
 			}
 		});
 		panel_1.add(btnAnalyze);
@@ -107,7 +112,7 @@ public class Window extends JFrame implements Runnable {
 		JButton btnAbort = new JButton("Abort");
 		panel_1.add(btnAbort);
 		
-		JProgressBar progressBar = new JProgressBar();
+		progressBar = new JProgressBar();
 		progressBar.setBackground(Color.BLACK);
 		panel_1.add(progressBar);
 		
@@ -225,6 +230,17 @@ public class Window extends JFrame implements Runnable {
 		
 		JPanel panel_2 = new JPanel();
 		tabbedPane.addTab("Statistics", null, panel_2, null);
+		panel_2.setLayout(null);
+		txtBox = new JTextArea("");		// static element
+		JScrollPane scrollBox = new JScrollPane(txtBox, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		txtBox.setBackground(Color.DARK_GRAY);
+		txtBox.setForeground(Color.WHITE);
+		scrollBox.setBackground(Color.DARK_GRAY);
+		scrollBox.setForeground(Color.WHITE);
+		scrollBox.setBounds(5, 0, 560, 285);
+		
+		//txtBox.setBounds(5, 0, 560, 285);
+		panel_2.add(scrollBox);
 		
 		JPanel panel_3 = new JPanel();
 		tabbedPane.addTab("Advanced Settings", null, panel_3, null);
