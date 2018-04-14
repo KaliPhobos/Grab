@@ -1,4 +1,4 @@
-package v00s16;
+package v00s17;
 
 import java.io.File;
 import java.io.FileReader;
@@ -108,13 +108,24 @@ public class General {
 		}
 		return FullNames;
 	}
-	public static List<File> loadFiles(String path) {			// BUG: Ignores any files in top directory
+	public static List<File> loadFiles(String path) {
+		int c_folders = 0;
 		List<File> allFiles = new ArrayList<File>();			// Creates Lists of all Files and Folders found
 		List<String> folders = new ArrayList<String>();			// Then recursively applies function to any found subfolders again
 		folders.add(path);										// Returns a list of any files
+		System.out.println("Adding new folder to To-Do-List: "+path);
+		if(path.endsWith("\\")) {
+			folders.add(path.substring(0, path.length()-1));
+			System.out.println("Adding new folder to To-Do-List: "+path.substring(0, path.length()-1));
+		} else {
+			folders.add(path+"\\");
+			System.out.println("Adding new folder to To-Do-List: "+path+"\\");
+		}
 		while (folders.isEmpty()==false) {
+			c_folders++;
+			System.out.println("Taking care of item "+c_folders+"/"+folders.size()+" - "+path);
 			path = folders.get(0);
-			System.out.println("new PATH: "+path);
+			System.out.println("Adding new folder to To-Do-List: "+path);
 			File folder = new File(path);
 			File[] listOfFiles = folder.listFiles();
 			if(listOfFiles==null) {
@@ -124,20 +135,20 @@ public class General {
 					if (listOfFiles[i].isDirectory()) {									// Enter subfolder
 				   		try {
 				   			File[] temp = new File(path+"\\"+listOfFiles[i].getName()).listFiles();
-							System.out.println("folder: "+listOfFiles[i].getPath());
+							System.out.println(" subfolder: "+listOfFiles[i].getPath());
 							for (int j = 0; j < temp.length; j++) {
-								System.out.println("file: "+temp[i].getPath());
+								System.out.println("file: "+temp[j].getPath());
 								if (!temp[j].isDirectory()) {							// No folders will show up in Results
 									allFiles.add(temp[j]);								// Add file in folder to list
 								}
 				   			}
 				   		} catch (Exception e) {
-				   			System.out.println("ERROR reading Folder " + path+"\\"+listOfFiles[i].getName());
+				   			System.out.println(" ERROR reading from " + path+"\\"+listOfFiles[i].getName());
 				   			folders.add(path+"\\"+listOfFiles[i].getName());
 				   		}
 				   	} else {
 				    	allFiles.add(listOfFiles[i]);									// Add file to list
-						System.out.println("file: "+listOfFiles[i].getPath());
+						System.out.println(" new file: "+listOfFiles[i].getPath());
 				   	}
 				}
 			}	// not null files
@@ -189,6 +200,7 @@ public class General {
 			{"msi", "Executable", "30"},
 			{"zip", "Archive", "60"},
 			{"rar", "Archive", "60"},
+			{"tar", "Archive", "60"},
 			{"7zip", "Archive", "60"},
 			{"tar.gz", "Archive", "60"},
 			{"iso", "Archive", "70"},

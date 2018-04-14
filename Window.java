@@ -1,4 +1,4 @@
-package v00s16;
+package v00s17;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -473,8 +473,9 @@ public class Window extends JFrame implements Runnable {
 	public void txtBoxUpdate() {
 		if (txtBox!=null) {
 			txtBox.setText(txtBoxContent);
+			System.out.println("TxtBox Update successfull");
 		} else {
-			System.out.println("element 'txtBox' coot initialized yet - setting 'text' parameter has to wait");
+			System.out.println("element 'txtBox' not initialized yet - setting 'text' parameter has to wait (first run?)");
 		}
 	}
 }
