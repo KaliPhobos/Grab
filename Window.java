@@ -1,4 +1,4 @@
-package v00s17;
+package v00s18;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -45,7 +45,8 @@ public class Window extends JFrame implements Runnable {
 	public static JButton btnDestination = null;
 	public static JButton btnAbort = null;
 	public static JLabel lblMessage = null;
-	
+	public static JLabel lblNewLabel = null;
+
 	public static TypeList MyTypeList = null;	// Holds ALL information about any file type
 	public static FileList MyFileList = null;	// Holds ALL information abut any found file
 	
@@ -126,7 +127,8 @@ public class Window extends JFrame implements Runnable {
 		});
 		
 		
-		JLabel lblNewLabel = new JLabel("New label");
+		//JLabel lblNewLabel = new JLabel("New label");
+		lblNewLabel = new JLabel("New label");
 		lblNewLabel.setForeground(Color.GREEN);
 		lblNewLabel.setBounds(405, 3, 110, 14);
 		panel_bottom.add(lblNewLabel);
@@ -477,5 +479,14 @@ public class Window extends JFrame implements Runnable {
 		} else {
 			System.out.println("element 'txtBox' not initialized yet - setting 'text' parameter has to wait (first run?)");
 		}
+	}
+	public void setStatusText(String text) {
+		lblNewLabel.setText(text);
+		/* None of the changes made to the JFrame's emements are currently visible as the
+		 * analytical work done in GENERAL is not moved to a new thread searated from the windows'.
+		 * Fixing this will have high priority as it would bring fullfunctionality for all GUI
+		 * buttons at any time as well.
+		 */
+		
 	}
 }

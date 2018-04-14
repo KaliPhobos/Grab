@@ -1,4 +1,4 @@
-package v00s17;
+package v00s18;
 
 import java.io.File;
 import java.io.FileReader;
@@ -10,8 +10,6 @@ import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 public class General {
-	
-	
 	
 	public static FileWriter createWriter(String path) {
 		FileWriter writer = null;
@@ -124,7 +122,7 @@ public class General {
 		while (folders.isEmpty()==false) {
 			c_folders++;
 			System.out.println("Taking care of item "+c_folders+"/"+folders.size()+" - "+path);
-			path = folders.get(0);
+			path = folders.get(0);				// Enforce id 0 each run - others will move up after it's deleted
 			System.out.println("Adding new folder to To-Do-List: "+path);
 			File folder = new File(path);
 			File[] listOfFiles = folder.listFiles();
@@ -132,18 +130,22 @@ public class General {
 				System.out.println("NULL files");
 			} else {
 				for (int i = 0; i < listOfFiles.length; i++) {
-					if (listOfFiles[i].isDirectory()) {									// Enter subfolder
+					if (listOfFiles[i].isDirectory() && path.endsWith("\\")) {									// Enter subfolder
 				   		try {
-				   			File[] temp = new File(path+"\\"+listOfFiles[i].getName()).listFiles();
+				   			File[] temp = new File(path+listOfFiles[i].getName()).listFiles();
 							System.out.println(" subfolder: "+listOfFiles[i].getPath());
 							for (int j = 0; j < temp.length; j++) {
-								System.out.println("file: "+temp[j].getPath());
 								if (!temp[j].isDirectory()) {							// No folders will show up in Results
 									allFiles.add(temp[j]);								// Add file in folder to list
+									System.out.println(" new file: "+temp[j].getPath());
+								} else {
+									System.out.println("Adding new folder to To-Do-List: "+temp[j].getPath());
+						   			folders.add(temp[j].getPath());
 								}
+					   			main.MainWin.setStatusText(allFiles.size()+" files ("+folders.size()+" left)");
 				   			}
 				   		} catch (Exception e) {
-				   			System.out.println(" ERROR reading from " + path+"\\"+listOfFiles[i].getName());
+				   			System.out.println(" ERROR reading from " + path+listOfFiles[i].getName());
 				   			folders.add(path+"\\"+listOfFiles[i].getName());
 				   		}
 				   	} else {
@@ -154,7 +156,9 @@ public class General {
 			}	// not null files
 			folders.remove(0);		// Remove first item in the line
 		}
-		
+		if (allFiles.size()==0) {
+			System.out.println("ERROR - No files were found, please check input parameters again");
+		}
 		return allFiles;
 	}
 	
@@ -187,6 +191,7 @@ public class General {
 			{"php", "Script", "60"},
 			{"js", "Script", "60"},
 			{"html", "Script", "50"},
+			{"htm", "Script", "50"},
 			{"css", "Script", "50"},
 			{"mp4", "Video", "63"},
 			{"mkv", "Video", "58"},
@@ -237,6 +242,19 @@ public class General {
 		}
 		if (!is_match) {																	// no match
 			result = 5;											// Basic relevance assigned to any unknown file type
+			boolean is_known = false;
+			for(int x=0;x<TypeList.Types.size();x++) {
+				if(TypeList.Types.get(x).getEnding().equals(ending)) {
+					TypeList.Types.get(x).increaseQuantity(1);
+					is_known = true;
+					break;
+				}
+			}
+			if (!is_known) {
+				TypeList.Types.add(TypeItem.createType(ending, "Unknown", 5, 0, 0));
+				// Only adds item entrance to TYPES element used for .analize()
+				// Will NOT count up related stats such as total combined file size per type
+			}
 		}
 		return result;
 	}

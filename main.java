@@ -1,13 +1,14 @@
-package v00s17;
+package v00s18;
 
 
 import java.awt.Color;
 
 public class main {
-
+	public static Window MainWin;
 	public static void main(String[] args) throws Exception {
-		String path = "C:\\Users\\p2\\Downloads\\";	//"/Users/p2";
-		(new Thread(new Window(path))).start();
+		String path = "C:\\";	//"/Users/p2";
+		MainWin = new Window(path);
+		(new Thread(MainWin)).start();
 		System.out.println("main done ...");
 	}
 	

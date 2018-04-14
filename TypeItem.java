@@ -1,4 +1,4 @@
-package v00s17;
+package v00s18;
 
 public class TypeItem {
 	String ending;
